@@ -175,3 +175,4 @@ for link in id_jogos:
         print(f'Erro de exception')
         pass
     
+print()
