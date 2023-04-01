@@ -1,0 +1,37 @@
+As hinted in GitHub help:
+
+Create a new repository on GitHub.
+
+Open Git Bash.
+
+Change the current working directory to your local project.
+
+Initialize the local directory as a Git repository.
+
+ $ git init
+Add the files in your new local repository. This stages them for the first commit.
+
+ $ git add .
+Commit the files that you've staged in your local repository.
+
+ $ git commit -m "First commit"
+At the top of your GitHub repository's Quick Setup page, click to copy the remote repository URL.
+
+In the Command prompt, add the URL for the remote repository where your local repository will be pushed.
+
+ $ git remote add origin <remote repository URL>
+ # Sets the new remote
+ $ git remote -v
+ # Verifies the new remote URL
+Push the changes in your local repository to GitHub if there is a remote branch called master (or main if that's what you're using)
+
+ $ git push origin master
+Otherwise you will have to name local branch first by
+
+ $ git branch -m <new_name>
+and then push it to add a new branch called <new_name>
+
+ $ git push origin -u <new_name>
+If you still end up with errors like "Updates were rejected because the remote contains work that you do not have locally", this is normally because that the remote repo is recently created manually. Make sure you are not overwriting anything on the remote end before you force push local git folder to it using
+
+$ git push origin -u -f <new_name>
