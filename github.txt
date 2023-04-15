@@ -35,3 +35,10 @@ and then push it to add a new branch called <new_name>
 If you still end up with errors like "Updates were rejected because the remote contains work that you do not have locally", this is normally because that the remote repo is recently created manually. Make sure you are not overwriting anything on the remote end before you force push local git folder to it using
 
 $ git push origin -u -f <new_name>
+
+
+---------------------
+
+git add .
+git commit -m "Comentário"
+git push origin main

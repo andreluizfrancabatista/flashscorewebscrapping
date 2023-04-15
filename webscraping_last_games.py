@@ -96,7 +96,9 @@ id_jogos = [i[4:] for i in id_jogos]
 
 # Configurações do report
 pick_stat = 'Corner Kicks'
-line_value = 3.5
+line_value = 6.5
+green = 0
+red = 0
 
 
 for link in id_jogos:
@@ -127,10 +129,18 @@ for link in id_jogos:
             away_value = stat.find_element(By.CSS_SELECTOR, 'div.stat__awayValue').text
             # print(f'{category_name}: {home_value}/{away_value}')
         
-        print(f'{Date} {Home} {HomeGoals} x {AwayGoals} {Away}\t{pick_stat}: {home_value}/{away_value}')
+        print(f'{Date} {Home} {HomeGoals} x {AwayGoals} {Away}\t{pick_stat}: {home_value}/{away_value}', end='')
+        if((int(home_value) + int(away_value)) > line_value):
+            print(f' Green')
+            green += 1
+        else:
+            print(f' Red')
+            red += 1
     except:
         print(f'Erro de exception')
         pass
+print(f'Green {green/(green+red)*100:.2f}%\nRed {red/(green+red)*100:.2f}%')
+# Fazer a média de corners marcados e sofridos
 
 # jogo = {'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],'Odds_H':[],'Odds_D':[],'Odds_A':[]}
 
