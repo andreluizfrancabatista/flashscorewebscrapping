@@ -60,12 +60,14 @@ from selenium.webdriver.common.by import By
 wd_Chrome.get("https://www.flashscore.com/") 
 
 ## Para jogos do dia seguinte / Comentar essa linha para os jogos agendados de hoje 
-# wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
+wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
 time.sleep(4)
 
 # Próximos passos
 # Localizar todos os event_info que estão fechados e abrir todos
-            
+# div.event__header > span.event__expanderBlock > svg.event__expander--close #clica para abrir
+# div.event__header > span.event__expanderBlock > svg.event__expander--open #clica para fechar
+# Tentei de várias formas e não deu certo. Aparentemente os elementos não são clicáveis.
 
 # Pegando o ID dos Jogos
 id_jogos = []
@@ -164,4 +166,4 @@ df.index = df.index.set_names(['Nº'])
 df = df.rename(index=lambda x: x + 1)
 # print(df)
 
-df.to_csv("jogos_de_hoje.csv", sep=";")
+df.to_csv("jogos_de_amanha.csv", sep=";")
