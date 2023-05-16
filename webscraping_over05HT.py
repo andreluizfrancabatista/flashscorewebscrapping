@@ -127,6 +127,8 @@ for i, link in enumerate(id_jogos):
             # Localizar todos os event_info que estão fechados e abrir todos
             # Adicionar mais duas colunas total de jogos analisados home e away
             # Tem time dando 100% de gol no ht mas tem apenas 3 jogos analisados
+            # Análise dos jogos do dia de hoje
+            
 
     except:
         print("\nExcept: link/match-summary")
