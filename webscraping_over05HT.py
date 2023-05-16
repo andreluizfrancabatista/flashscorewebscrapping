@@ -59,9 +59,13 @@ from selenium.webdriver.common.by import By
 # Com o WebDrive a gente consegue a pedir a página (URL)
 wd_Chrome.get("https://www.flashscore.com/") 
 
-## Para jogos do dia seguinte
-wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
+## Para jogos do dia seguinte / Comentar essa linha para os jogos agendados de hoje 
+# wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
 time.sleep(4)
+
+# Próximos passos
+# Localizar todos os event_info que estão fechados e abrir todos
+            
 
 # Pegando o ID dos Jogos
 id_jogos = []
@@ -77,12 +81,12 @@ for i in jogos:
 # Exemplo de ID de um jogo: 'g_1_Gb7buXVt'    
 id_jogos = [i[4:] for i in id_jogos]
 
-jogo = {'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],'pHome':[], 'pAway':[], 'Sum':[]}
+jogo = {'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],'golshtHome':[], 'totalHome':[], 'golshtAway':[], 'totalAway':[],'pHome':[], 'pAway':[], 'Sum':[]}
 
-# for link in tqdm(id_jogos, total=len(id_jogos)):
-for i, link in enumerate(id_jogos):
-    if(i>9):
-        break
+for link in tqdm(id_jogos, total=len(id_jogos)):
+# for i, link in enumerate(id_jogos):
+#     if(i>9):
+#         break
     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary')
     
     # Pegando as Informacoes Básicas do Jogo
@@ -121,15 +125,13 @@ for i, link in enumerate(id_jogos):
                     golsht += 1
             if(index==0):
                 pHome = golsht/total
+                totalHome = total
+                golshtHome = golsht
             if(index==1):
                 pAway = golsht/total
-            # Próximos passos
-            # Localizar todos os event_info que estão fechados e abrir todos
-            # Adicionar mais duas colunas total de jogos analisados home e away
-            # Tem time dando 100% de gol no ht mas tem apenas 3 jogos analisados
-            # Análise dos jogos do dia de hoje
-            
-
+                totalAway = total
+                golshtAway = golsht
+                        
     except:
         print("\nExcept: link/match-summary")
         pass
@@ -137,17 +139,23 @@ for i, link in enumerate(id_jogos):
     # print(Date,Time,Country,League,Home,Away,Odds_H,Odds_D,Odds_A) 
     # print(f'{Date}, {Time}, {Country}, {League}\n{Home} {pHome*100:.2f} x {pAway*100:.2f} {Away}\n') 
 
-    # Colocar tudo dentro do df pra salvar no xlsx
+    # Colocar tudo dentro do df pra salvar no csv
 
-    jogo['Date'].append(Date)
+    jogo['Date'].append(Date.replace(".", "/"))
     jogo['Time'].append(Time)
-    jogo['Country'].append(Country.replace(",", "-"))
-    jogo['League'].append(League.replace(",", "-"))
-    jogo['Home'].append(Home.replace(",", "-"))
-    jogo['Away'].append(Away.replace(",", "-"))
-    jogo['pHome'].append(round(pHome, 4))
-    jogo['pAway'].append(round(pAway, 4))
-    jogo['Sum'].append(round(round(pHome, 4) + round(pAway, 4)), 4)
+    jogo['Country'].append(Country.replace(";", "-"))
+    jogo['League'].append(League.replace(";", "-"))
+    jogo['Home'].append(Home.replace(";", "-"))
+    jogo['Away'].append(Away.replace(";", "-"))
+    jogo['golshtHome'].append(golshtHome)
+    jogo['totalHome'].append(totalHome)
+    jogo['golshtAway'].append(golshtAway)
+    jogo['totalAway'].append(totalAway)
+    jogo['pHome'].append(str(round(pHome, 4)).replace(".", ","))
+    jogo['pAway'].append(str(round(pAway, 4)).replace(".", ","))
+    jogo['Sum'].append(
+        str(round((round(pHome, 4) + round(pAway, 4)), 4)).replace(".", ",")
+        )
     
 
 df = pd.DataFrame(jogo)
@@ -156,4 +164,4 @@ df.index = df.index.set_names(['Nº'])
 df = df.rename(index=lambda x: x + 1)
 # print(df)
 
-df.to_csv("jogos_de_amanha_2.csv")
+df.to_csv("jogos_de_hoje.csv", sep=";")

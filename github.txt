@@ -42,3 +42,16 @@ $ git push origin -u -f <new_name>
 git add .
 git commit -m "Comentário"
 git push origin main
+
+
+---------------------
+
+# Para atualizar o repositório local a partir do repositório remoto
+git reset --hard
+git pull
+
+OU
+
+git stash
+git stash drop
+git pull
