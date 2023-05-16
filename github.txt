@@ -38,6 +38,7 @@ $ git push origin -u -f <new_name>
 
 
 ---------------------
+# Usar o git Bash
 
 git add .
 git commit -m "Comentário"
