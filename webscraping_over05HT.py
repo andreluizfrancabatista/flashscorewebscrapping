@@ -77,10 +77,12 @@ for i in jogos:
 # Exemplo de ID de um jogo: 'g_1_Gb7buXVt'    
 id_jogos = [i[4:] for i in id_jogos]
 
-jogo = {'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],'Odds_H':[],'Odds_D':[],'Odds_A':[]}
+jogo = {'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],'pHome':[], 'pAway':[]}
 
 # for link in tqdm(id_jogos, total=len(id_jogos)):
-for link in id_jogos:
+for i, link in enumerate(id_jogos):
+    if(i>9):
+        break
     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary')
     
     # Pegando as Informacoes Básicas do Jogo
@@ -94,134 +96,61 @@ for link in id_jogos:
         LinkHome = Home.find_element(By.CSS_SELECTOR,'div.participant__participantName')
         LinkHome = LinkHome.find_element(By.TAG_NAME, 'a').get_attribute('href')
         Home = Home.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
-        Away = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__away') # Select href do <a>
+        Away = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__away')
         LinkAway = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName')
         LinkAway = LinkAway.find_element(By.TAG_NAME, 'a').get_attribute('href')
         Away = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
-
-        # Próximos passos
-        # Acessar o link do time da casa add results/ no final do link
-        # Pega a lista de jogos 
-        # # # Pegando as DIVs dos Jogos
-            ## Para jogos passados
-            # jogos = wd_Chrome.find_elements(By.CSS_SELECTOR,'div.event__match--static') OR 'div.event__match--last'
-        # Iterando com a lista de DIVs
-        # for i in jogos:
-            # A = Conta o total de jogos
-            # B = Conta o total de jogos que teve gol no HT
-            # (By.CSS_SELECTOR, 'event__part event__part--home event__part--1').text --> vai retornar (0) tem que tirar os ()
-            # (By.CSS_SELECTOR, 'event__part event__part--away event__part--1').text --> vai retornar (0) tem que tirar os ()
-        # Calcula a porcentagem de gols no HT pra esse time da casa
-        # porcentagemHOME = B/A
-        wd_Chrome.get(f'{LinkHome}results/')
-        # time.sleep(2) # precisa de sleep?
-        jogos = wd_Chrome.find_elements(By.CSS_SELECTOR,'div.event__match--static') #OR 'div.event__match--last'
-        total = 0
-        golsht = 0
         
-        for i in jogos:
-            try:
+        # Calcular a porcentagem de over 0,5 no HT de cada time
+        links = [LinkHome, LinkAway]
+        for index, sublink in enumerate(links):
+            wd_Chrome.get(f'{sublink}results/')
+            # time.sleep(2) # precisa de sleep?
+
+            jogos = wd_Chrome.find_elements(By.CSS_SELECTOR,'div.event__match--static') #OR 'div.event__match--last'
+            total = 0
+            golsht = 0
+            
+            for i in jogos:
                 golsHome = i.find_element(By.CSS_SELECTOR, 'div.event__part--home').text
                 golsHome = int(golsHome[1:2])
                 golsAway = i.find_element(By.CSS_SELECTOR, 'div.event__part--away').text
                 golsAway = int(golsAway[1:2])
-                # print(f'{golsHome} x {golsAway}')
                 total += 1
                 if((golsHome+golsAway) > 0):
                     golsht += 1
-            except:
-                pass
-        pHome = golsht/total
-        print(pHome)
-
-
-
-
-        # Match Odds
-        # wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/odds-comparison/1x2-odds/full-time')
-        # time.sleep(2)
-        # celulas = wd_Chrome.find_elements(By.CSS_SELECTOR,'div.ui-table__row')
-        
-        # Odds_H = 0
-        # Odds_D = 0
-        # Odds_A = 0
-        
-        # if 'title="bet365"' in str(wd_Chrome.find_element(By.CSS_SELECTOR,'div.ui-table.oddsCell__odds')):
-        #     for celula in celulas:
-        #         bookie = celula.find_element(By.CSS_SELECTOR,'img.prematchLogo')
-        #         bookie = bookie.get_attribute('title')
-        #         if ((bookie == 'bet365') & (Odds_H == 0)) | ((bookie == 'Betfair') & (Odds_H == 0)):
-        #             Odds_H = celula.find_elements(By.CSS_SELECTOR,'a.oddsCell__odd')[0].text
-        #             Odds_D = celula.find_elements(By.CSS_SELECTOR,'a.oddsCell__odd')[1].text 
-        #             Odds_A = celula.find_elements(By.CSS_SELECTOR,'a.oddsCell__odd')[2].text
-        #         else:
-        #             pass
-        # else:
-        #     for celula in celulas:
-        #         Odds_H = celula.find_elements(By.CSS_SELECTOR,'a.oddsCell__odd')[0].text
-        #         Odds_D = celula.find_elements(By.CSS_SELECTOR,'a.oddsCell__odd')[1].text 
-        #         Odds_A = celula.find_elements(By.CSS_SELECTOR,'a.oddsCell__odd')[2].text
+            if(index==0):
+                pHome = golsht/total
+            if(index==1):
+                pAway = golsht/total
+            # Próximos passos
+            # Localizar todos os event_info que estão fechados e abrir todos
+            # Adicionar mais duas colunas total de jogos analisados home e away
+            # Tem time dando 100% de gol no ht mas tem apenas 3 jogos analisados
 
     except:
-        print("Except")
+        print("\nExcept: link/match-summary")
         pass
 
     # print(Date,Time,Country,League,Home,Away,Odds_H,Odds_D,Odds_A) 
-    print(Date,Time,Country,League,Home,Away,LinkHome,LinkAway) 
+    # print(f'{Date}, {Time}, {Country}, {League}\n{Home} {pHome*100:.2f} x {pAway*100:.2f} {Away}\n') 
 
     # Colocar tudo dentro do df pra salvar no xlsx
 
-#     jogo['Date'].append(Date)
-#     jogo['Time'].append(Time)
-#     jogo['Country'].append(Country)
-#     jogo['League'].append(League)
-#     jogo['Home'].append(Home)
-#     jogo['Away'].append(Away)
-#     jogo['Odds_H'].append(Odds_H)
-#     jogo['Odds_D'].append(Odds_D)
-#     jogo['Odds_A'].append(Odds_A)
-
-# df = pd.DataFrame(jogo)
-# df = df[(df.Odds_H != 0)]
-# df.reset_index(inplace=True, drop=True)
-# df.index = df.index.set_names(['Nº'])
-# df = df.rename(index=lambda x: x + 1)
-# # print(df)
-
-# df.to_excel("jogos_de_amanha.xlsx")
-
-## Recuperando as estatísticas das partidas ao vivo
-# jogo = {'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],'Odds_H':[],'Odds_D':[],'Odds_A':[]}
-
-# stats = {'Ball Possession':[],'Goal Attempts':[],'Shots on Goal':[],'Shots off Goal':[],'Blocked Shots':[],'Free Kicks':[],'Corner Kicks':[],'Offsides':[],'Throw-in':[],'Goalkeeper Saves':[],'Fouls':[],'Yellow Cards':[],'Total Passes':[],'Completed Passes':[],'Tackles':[],'Attacks':[],'Dangerous Attacks':[]}
-
-# # for link in tqdm(id_jogos, total=len(id_jogos)):
-# for link in id_jogos:
-#     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary/match-statistics/0')
-#     time.sleep(2)
+    jogo['Date'].append(Date)
+    jogo['Time'].append(Time)
+    jogo['Country'].append(Country.replace(",", "-"))
+    jogo['League'].append(League.replace(",", "-"))
+    jogo['Home'].append(Home.replace(",", "-"))
+    jogo['Away'].append(Away.replace(",", "-"))
+    jogo['pHome'].append(round(pHome, 4))
+    jogo['pAway'].append(round(pAway, 4))
     
-#     # Pegando as estatísticas de cada jogo ao vivo
-#     try:
-#         Date = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__startTime').text.split(' ')[0]
-#         Home = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__home')
-#         Home = Home.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
-#         Away = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__away')
-#         Away = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
-#         HomeGoals = wd_Chrome.find_element(By.CSS_SELECTOR, 'div.detailScore__wrapper > span:nth-child(1)').text
-#         AwayGoals = wd_Chrome.find_element(By.CSS_SELECTOR, 'div.detailScore__wrapper > span:nth-child(3)').text
-#         HT = wd_Chrome.find_element(By.CSS_SELECTOR, 'div.detailScore__status > span').text
-#         TimePlayed = wd_Chrome.find_element(By.CSS_SELECTOR, 'div.eventAndAddedTime > span').text
-#         StatsElements = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.stat__category')
-#         print()
-#         print(f'{Home} {HomeGoals} x {AwayGoals} {Away}')
-#         print(f'{HT} - {TimePlayed}')
-#         for stat in StatsElements:
-#           category_name = stat.find_element(By.CSS_SELECTOR, 'div.stat__categoryName').text
-#           home_value = stat.find_element(By.CSS_SELECTOR, 'div.stat__homeValue').text
-#           away_value = stat.find_element(By.CSS_SELECTOR, 'div.stat__awayValue').text
-#           print(f'{category_name}: {home_value}/{away_value}')
-#     except:
-#         print(f'Erro de exception')
-#         pass
-    
-# print()
+
+df = pd.DataFrame(jogo)
+df.reset_index(inplace=True, drop=True)
+df.index = df.index.set_names(['Nº'])
+df = df.rename(index=lambda x: x + 1)
+# print(df)
+
+df.to_csv("jogos_de_amanha_2.csv", sep=";")
