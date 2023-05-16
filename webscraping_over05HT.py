@@ -61,7 +61,7 @@ wd_Chrome.get("https://www.flashscore.com/")
 
 ## Para jogos do dia seguinte
 wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
-time.sleep(2)
+time.sleep(4)
 
 # Pegando o ID dos Jogos
 id_jogos = []
@@ -77,7 +77,7 @@ for i in jogos:
 # Exemplo de ID de um jogo: 'g_1_Gb7buXVt'    
 id_jogos = [i[4:] for i in id_jogos]
 
-jogo = {'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],'pHome':[], 'pAway':[]}
+jogo = {'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],'pHome':[], 'pAway':[], 'Sum':[]}
 
 # for link in tqdm(id_jogos, total=len(id_jogos)):
 for i, link in enumerate(id_jogos):
@@ -147,6 +147,7 @@ for i, link in enumerate(id_jogos):
     jogo['Away'].append(Away.replace(",", "-"))
     jogo['pHome'].append(round(pHome, 4))
     jogo['pAway'].append(round(pAway, 4))
+    jogo['Sum'].append(round(round(pHome, 4) + round(pAway, 4)), 4)
     
 
 df = pd.DataFrame(jogo)
@@ -155,4 +156,4 @@ df.index = df.index.set_names(['Nº'])
 df = df.rename(index=lambda x: x + 1)
 # print(df)
 
-df.to_csv("jogos_de_amanha_2.csv", sep=";")
+df.to_csv("jogos_de_amanha_2.csv")
