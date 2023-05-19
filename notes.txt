@@ -4,7 +4,3 @@ https://youtu.be/CjTgetVplJc
 
 https://selenium-python.readthedocs.io/api.html
 
-A fazer
-- A média tá dando zero
-- Algumas colunas estão dando zero
-- Corrigir os zeros que estão aparecendo
