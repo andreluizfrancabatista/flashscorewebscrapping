@@ -4,3 +4,17 @@ https://youtu.be/CjTgetVplJc
 
 https://selenium-python.readthedocs.io/api.html
 
+Estudar sobre processamento paralelo em python
+
+https://www.tutorialspoint.com/concurrency_in_python/index.htm
+
+https://medium.com/data-hackers/como-fazer-processamento-paralelo-com-python-586fe8f589aa
+
+https://towardsdatascience.com/python-concurrency-concurrent-futures-15b56dc9a14d
+
+https://docs.python.org/3/library/concurrent.futures.html
+
+
+554 jogos, 1h14m25s para completar
+
+VERIFICAR --> https://www.python-engineer.com/posts/threadpoolexecutor/
