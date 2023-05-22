@@ -18,3 +18,8 @@ https://docs.python.org/3/library/concurrent.futures.html
 554 jogos, 1h14m25s para completar
 
 VERIFICAR --> https://www.python-engineer.com/posts/threadpoolexecutor/
+
+A fazer
+
+--> Código que recebe dois IDs de times, e retorna as porcentagens de gols HT
+--> Código para pegar os jogos futuros de hoje
