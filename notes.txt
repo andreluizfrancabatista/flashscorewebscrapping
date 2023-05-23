@@ -23,3 +23,7 @@ A fazer
 
 --> Código que recebe dois IDs de times, e retorna as porcentagens de gols HT
 --> Código para pegar os jogos futuros de hoje
+
+
+--> Fazer um código para salvar os CSV em um banco de dados (mongodb)
+--> Acessar o conteudo do BD pelo Flask
