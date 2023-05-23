@@ -194,5 +194,5 @@ df.reset_index(inplace=True, drop=True)
 df.index = df.index.set_names(['Nº'])
 df = df.rename(index=lambda x: x + 1)
 # print(df)
-filename = "jogos_de_amanha_"+Date.replace(".", "_")+".csv"
+filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+".csv"
 df.to_csv(filename, sep=";")
