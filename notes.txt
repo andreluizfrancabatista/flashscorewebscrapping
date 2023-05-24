@@ -22,4 +22,6 @@ VERIFICAR --> https://www.python-engineer.com/posts/threadpoolexecutor/
 A fazer
 
 --> Código que recebe dois IDs de times, e retorna as porcentagens de gols HT
+--> Fazer uma interface web para isso
 --> Código para pegar os jogos futuros de hoje
+--> Arrumar a programação paralela
