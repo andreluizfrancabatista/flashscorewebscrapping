@@ -56,3 +56,9 @@ OU
 git stash
 git stash drop
 git pull
+
+
+-------------------
+Para clonar um repositorio
+- Fazer o fork
+- git clone <link>
