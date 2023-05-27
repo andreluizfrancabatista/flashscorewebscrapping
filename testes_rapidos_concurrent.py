@@ -24,7 +24,6 @@ Criado por:
 
 # !cp /usr/lib/chromium-browser/chromedriver /usr/bin
 import time
-start_time = time.time()
 
 import sys
 sys.path.insert(0,'/usr/lib/chromium-browser/chromedriver')
@@ -46,7 +45,8 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-def getinfo(link, wd_Chrome):
+def getinfo(driver, link):
+    wd_Chrome = driver
     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary/') # English
     try:
         Date = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__startTime').text.split(' ')[0]
@@ -90,8 +90,8 @@ if __name__ == '__main__':
     time.sleep(2)
 
     ## Para jogos do dia seguinte / Comentar essa linha para os jogos agendados de hoje 
-    # wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
-    # time.sleep(2)
+    wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
+    time.sleep(2)
 
     # Pegando o ID dos Jogos
     id_jogos = []
@@ -107,25 +107,58 @@ if __name__ == '__main__':
     # Exemplo de ID de um jogo: 'g_1_Gb7buXVt'    
     id_jogos = [i[4:] for i in id_jogos]
 
+    # Limitar o tamanho em 100
+    if(len(id_jogos)>100):
+        id_jogos = id_jogos[:100]
+
     # Exibir a quantidade de jogos coletados
     print(f'Jogos: {len(id_jogos)}')
 
-    futures = []
 
-    # creating multiple executor - Parallel processing
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        # Map: aplica função a lista
+
+    # pool = ThreadPoolExecutor(max_workers=4)
+    # results = pool.map(getinfo, id_jogos)
+
+    # for res in results:
+    #     print(res)
+    
+    # pool.shutdown()
+    
+    futures = []
+    start_time = time.time()
+    # # creating multiple executor - Parallel processing
+    with ThreadPoolExecutor() as executor, webdriver.Chrome('chromedriver',options=options) as driver:
         for link in id_jogos:
-            futures.append(executor.submit(getinfo, link, wd_Chrome))
+            futures.append(executor.submit(getinfo, driver, link))
     
     wait(futures)
     
-    for future in futures:
-        print(future.result())
+    # # for future in futures:
+    # #     print(future.result())
+    print(f'% Futures: --- {time.time() - start_time} seconds --- %')
+    # print()
+    # print()
 
-
+    #################
+    start_time = time.time()
     # Sem concurrent
-    # result = map(getinfo, id_jogos)
-    # print(list(result))
+    result = map(getinfo, id_jogos)
+    print(list(result))
 
-    print(f'% --- {time.time() - start_time} seconds --- %')
+    print(f'% Serial: --- {time.time() - start_time} seconds --- %')
+
+
+    ##################
+    # With Threads
+    start_time = time.time()
+    pool = ThreadPoolExecutor()
+    results = list(pool.map(getinfo, id_jogos))
+    print(results)
+    print(f'% With threads: --- {time.time() - start_time} seconds --- %')
+
+    ##################
+    # With subprocess
+    # start_time = time.time()
+    # pool = ProcessPoolExecutor(max_workers=2)
+    # results = list(pool.map(getinfo, id_jogos))
+    # print(f'% With subprocess: --- {time.time() - start_time} seconds --- %')
