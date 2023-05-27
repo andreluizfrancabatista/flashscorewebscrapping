@@ -65,7 +65,7 @@ stats = {'Date':[],
          }
 
 # Quantidade de dias passados
-dias = 7
+dias = 3
 while(dias > 0):
     # Pegar a data 
     data = wd_Chrome.find_element(By.CSS_SELECTOR, 'button#calendarMenu').text

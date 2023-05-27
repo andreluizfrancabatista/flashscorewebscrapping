@@ -39,7 +39,7 @@ wd_Chrome.get("https://www.flashscore.com/")
 time.sleep(2)
 
 # Receber o ID da partida
-id_jogos = ["YeTL64Xb"]
+id_jogos = ["rJGYG4dD", "Ovkpf7qo", "4SgPLJxQ", "4jxCCFaC", "M7tiHwos"]
 jogo = {'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],'golshtHome':[], 'totalHome':[], 'AvgHome':[], 'golshtAway':[], 'totalAway':[], 'AvgAway':[], 'pHome':[], 'pAway':[], 'Sum':[], 'Times':[]}
 
 for link in tqdm(id_jogos, total=len(id_jogos)):

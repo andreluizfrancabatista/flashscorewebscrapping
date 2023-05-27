@@ -25,12 +25,12 @@ A fazer
 --> Fazer um código para salvar os CSV em um banco de dados (mongodb)
 --> Acessar o conteudo do BD pelo Flask
 --> Fazer uma interface web para isso
---> Arrumar a programação paralela
---> Código para pegar os jogos futuros de hoje
+--> OK -- Código para pegar os jogos futuros de hoje
 --> OK -- Código para calcular a porcentagem de gols HT nos jogos finalizados de hoje/ontem
-
+--> Adicionar colunas com a porcentagem de 15 jogos, 20 jogos, 25 jogos, 30 jogos.
 
 -----------------------
+--> Arrumar a programação paralela
 - O código testes_rapidos_concurrent.py está muito bagunçado
 - Tentar um código novo com a ideia do link https://stackoverflow.com/questions/36050256/how-to-use-several-instance-of-selenium-python
 - Fazer três instâncias do driver, fazer o zip(driver, links)
