@@ -64,8 +64,8 @@ wd_Chrome.get("https://www.flashscore.com/")
 time.sleep(2)
 
 ## Para jogos do dia seguinte / Comentar essa linha para os jogos agendados de hoje 
-#wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
-#time.sleep(2)
+wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
+time.sleep(2)
 
 # Inserir aqui wait until element become clickable pra testar abrir os jogos fechados
 # element = WebDriverWait(wd_Chrome, 10).until(

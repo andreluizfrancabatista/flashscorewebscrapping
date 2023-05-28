@@ -69,8 +69,13 @@ wd_Chrome.get("https://www.flashscore.com/")
 time.sleep(2)
 
 ## Para jogos do dia seguinte / Comentar essa linha para os jogos agendados de hoje 
-#wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
-time.sleep(2)
+# wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
+# time.sleep(2)
+
+# Abrir os jogos fechados
+display_matches = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__info')
+for button in display_matches:
+    wd_Chrome.execute_script("arguments[0].click();", button)
 
 # Pegando o ID dos Jogos
 id_jogos = []
@@ -90,24 +95,25 @@ id_jogos = [i[4:] for i in id_jogos]
 print(f'Jogos: {len(id_jogos)}')
 
 # for link in tqdm(id_jogos, total=len(id_jogos)):
-for link in id_jogos:
-    wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary/') # English
-    try:
-        Date = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__startTime').text.split(' ')[0]
-        Time = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__startTime').text.split(' ')[1]
-        Country = wd_Chrome.find_element(By.CSS_SELECTOR,'span.tournamentHeader__country').text.split(':')[0]
-        League = wd_Chrome.find_element(By.CSS_SELECTOR,'span.tournamentHeader__country')
-        League = League.find_element(By.CSS_SELECTOR,'a').text
-        Home = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__home')
-        LinkHome = Home.find_element(By.CSS_SELECTOR,'div.participant__participantName')
-        LinkHome = LinkHome.find_element(By.TAG_NAME, 'a').get_attribute('href')
-        Home = Home.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
-        Away = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__away')
-        LinkAway = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName')
-        LinkAway = LinkAway.find_element(By.TAG_NAME, 'a').get_attribute('href')
-        Away = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
-    except:
-        pass
-    print(f'{Date}, {Time}, {Country}, {League}\n{Home} x {Away}\n') 
+# for link in id_jogos:
+#     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary/') # English
+#     try:
+#         Date = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__startTime').text.split(' ')[0]
+#         Time = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__startTime').text.split(' ')[1]
+#         Country = wd_Chrome.find_element(By.CSS_SELECTOR,'span.tournamentHeader__country').text.split(':')[0]
+#         League = wd_Chrome.find_element(By.CSS_SELECTOR,'span.tournamentHeader__country')
+#         League = League.find_element(By.CSS_SELECTOR,'a').text
+#         Home = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__home')
+#         LinkHome = Home.find_element(By.CSS_SELECTOR,'div.participant__participantName')
+#         LinkHome = LinkHome.find_element(By.TAG_NAME, 'a').get_attribute('href')
+#         Home = Home.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
+#         Away = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__away')
+#         LinkAway = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName')
+#         LinkAway = LinkAway.find_element(By.TAG_NAME, 'a').get_attribute('href')
+#         Away = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
+#     except:
+#         pass
+#     print(f'{Date}, {Time}, {Country}, {League}\n{Home} x {Away}\n') 
 
-print(f'% --- {time.time() - start_time} seconds --- %')
+print(f'% --- {(time.time() - start_time):.2f} seconds --- %')
+

@@ -36,3 +36,4 @@ A fazer
 - Fazer três instâncias do driver, fazer o zip(driver, links)
 - Ao que tudo indica, estou usando uma única instância do driver para fazer o scrap
 - O ideal seria abrir mais de uma instância.
+
