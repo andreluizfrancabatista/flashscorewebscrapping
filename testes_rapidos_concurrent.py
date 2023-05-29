@@ -24,7 +24,7 @@ Criado por:
 
 # !cp /usr/lib/chromium-browser/chromedriver /usr/bin
 import time
-
+from itertools import cycle
 import sys
 sys.path.insert(0,'/usr/lib/chromium-browser/chromedriver')
 
@@ -82,6 +82,11 @@ if __name__ == '__main__':
 
     # Criação do WebDriver do Chrome
     wd_Chrome = webdriver.Chrome('chromedriver',options=options)
+    wd_Chrome1 = webdriver.Chrome('chromedriver',options=options)
+    wd_Chrome2 = webdriver.Chrome('chromedriver',options=options)
+    wd_Chrome3 = webdriver.Chrome('chromedriver',options=options)
+
+    drivers = [wd_Chrome1, wd_Chrome2, wd_Chrome3]
 
     """# Iniciando a Raspagem de Dados"""
 
@@ -114,7 +119,25 @@ if __name__ == '__main__':
     # Exibir a quantidade de jogos coletados
     print(f'Jogos: {len(id_jogos)}')
 
-
+    # Teste com múltiplas instâncias 
+    start_time = time.time()
+    futures = []
+    with ThreadPoolExecutor(max_workers=3) as ex:
+        zip_list = zip(id_jogos, cycle(drivers)) if len(id_jogos) > len(drivers) else zip(cycle(id_jogos), drivers)
+        for par in zip_list:
+            try:
+                futures.append(ex.submit(getinfo,par[1],par[0])) # getinfo(driver, link)
+            except:
+                pass
+            
+    wait(futures)
+    
+    for future in futures:
+        try:
+            print(future.result())
+        except:
+            pass
+    print(f'% Futures: --- {time.time() - start_time} seconds --- %')
 
     # pool = ThreadPoolExecutor(max_workers=4)
     # results = pool.map(getinfo, id_jogos)
@@ -124,37 +147,37 @@ if __name__ == '__main__':
     
     # pool.shutdown()
     
-    futures = []
-    start_time = time.time()
-    # # creating multiple executor - Parallel processing
-    with ThreadPoolExecutor() as executor, webdriver.Chrome('chromedriver',options=options) as driver:
-        for link in id_jogos:
-            futures.append(executor.submit(getinfo, driver, link))
+    # futures = []
+    # start_time = time.time()
+    # # # creating multiple executor - Parallel processing
+    # with ThreadPoolExecutor() as executor, webdriver.Chrome('chromedriver',options=options) as driver:
+    #     for link in id_jogos:
+    #         futures.append(executor.submit(getinfo, driver, link))
     
-    wait(futures)
+    # wait(futures)
     
     # # for future in futures:
     # #     print(future.result())
-    print(f'% Futures: --- {time.time() - start_time} seconds --- %')
+    # print(f'% Futures: --- {time.time() - start_time} seconds --- %')
     # print()
     # print()
 
     #################
-    start_time = time.time()
+    #start_time = time.time()
     # Sem concurrent
-    result = map(getinfo, id_jogos)
-    print(list(result))
+    #result = map(getinfo, id_jogos)
+    #print(list(result))
 
-    print(f'% Serial: --- {time.time() - start_time} seconds --- %')
+    #print(f'% Serial: --- {time.time() - start_time} seconds --- %')
 
 
     ##################
     # With Threads
-    start_time = time.time()
-    pool = ThreadPoolExecutor()
-    results = list(pool.map(getinfo, id_jogos))
-    print(results)
-    print(f'% With threads: --- {time.time() - start_time} seconds --- %')
+    # start_time = time.time()
+    # pool = ThreadPoolExecutor()
+    # results = list(pool.map(getinfo, id_jogos))
+    # print(results)
+    # print(f'% With threads: --- {time.time() - start_time} seconds --- %')
 
     ##################
     # With subprocess

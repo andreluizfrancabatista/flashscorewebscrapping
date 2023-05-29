@@ -67,10 +67,10 @@ time.sleep(2)
 wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
 time.sleep(2)
 
-# Inserir aqui wait until element become clickable pra testar abrir os jogos fechados
-# element = WebDriverWait(wd_Chrome, 10).until(
-#     EC.element_to_be_clickable((By.CSS_SELECTOR, 'div.event__info')) # div.event__info, span.event__expanderBlock, svg.event__expander--close
-# )
+# Abrir os jogos fechados
+display_matches = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__info')
+for button in display_matches:
+    wd_Chrome.execute_script("arguments[0].click();", button)
 
 # Pegando o ID dos Jogos
 id_jogos = []
