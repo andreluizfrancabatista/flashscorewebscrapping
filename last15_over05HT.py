@@ -135,35 +135,36 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
             total, golsht = 0, 0
             gols = 0
             # print(f'{index}: {sublink}results/') # English
-            for i in jogos:
-                try:
-                    golsHome = i.find_element(By.CSS_SELECTOR, 'div.event__part--home').text
-                    golsHome = int(golsHome[1:2])
-                    gols += golsHome
-                    golsAway = i.find_element(By.CSS_SELECTOR, 'div.event__part--away').text
-                    golsAway = int(golsAway[1:2])
-                    gols += golsAway
-                    # print(f'{golsHome}x{golsAway} ', end="")
-                    total += 1
-                    if((golsHome+golsAway) > 0):
-                        golsht += 1
-                except:
-                    # print(f'?x? ', end="")
-                    pass
-            # print()
-            if(index==0):
-                pHome = golsht/total
-                totalHome = total
-                golshtHome = golsht
-                mediaGolsHTHome = gols/total
-                # print(f'pHome:{pHome*100:.2f} jogos:{totalHome} jogosComGolHT:{golshtHome} média:{mediaGolsHTHome:.2f} gols:{gols}')
-            if(index==1):
-                pAway = golsht/total
-                totalAway = total
-                golshtAway = golsht
-                mediaGolsHTAway = gols/total
-                # print(f'pAway:{pAway*100:.2f} jogos:{totalAway} jogosComGolHT:{golshtAway} média:{mediaGolsHTAway:.2f} gols:{gols}')
-            # print()       
+            while(total<=15):
+                for i in jogos:
+                    try:
+                        golsHome = i.find_element(By.CSS_SELECTOR, 'div.event__part--home').text
+                        golsHome = int(golsHome[1:2])
+                        gols += golsHome
+                        golsAway = i.find_element(By.CSS_SELECTOR, 'div.event__part--away').text
+                        golsAway = int(golsAway[1:2])
+                        gols += golsAway
+                        # print(f'{golsHome}x{golsAway} ', end="")
+                        total += 1
+                        if((golsHome+golsAway) > 0):
+                            golsht += 1
+                    except:
+                        # print(f'?x? ', end="")
+                        pass
+                # print()
+                if(index==0):
+                    pHome = golsht/total
+                    totalHome = total
+                    golshtHome = golsht
+                    mediaGolsHTHome = gols/total
+                    # print(f'pHome:{pHome*100:.2f} jogos:{totalHome} jogosComGolHT:{golshtHome} média:{mediaGolsHTHome:.2f} gols:{gols}')
+                if(index==1):
+                    pAway = golsht/total
+                    totalAway = total
+                    golshtAway = golsht
+                    mediaGolsHTAway = gols/total
+                    # print(f'pAway:{pAway*100:.2f} jogos:{totalAway} jogosComGolHT:{golshtAway} média:{mediaGolsHTAway:.2f} gols:{gols}')
+                # print()       
     except:
         print(f'\nExcept: {link}')
         pass
@@ -190,11 +191,10 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
         str(round((round(pHome, 4) + round(pAway, 4)), 4)).replace(".", ",")
         )
     
-
 df = pd.DataFrame(jogo)
 df.reset_index(inplace=True, drop=True)
 df.index = df.index.set_names(['Nº'])
 df = df.rename(index=lambda x: x + 1)
 # print(df)
-filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+".csv"
+filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_last15.csv"
 df.to_csv(filename, sep=";")
