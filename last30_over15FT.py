@@ -88,9 +88,10 @@ id_jogos = [i[4:] for i in id_jogos]
 
 jogo = {
     'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],
-    'golshtHome':[], 'totalHome':[], 'AvgHome':[], 
-    'golshtAway':[], 'totalAway':[], 'AvgAway':[], 
-    'pHome':[], 'pAway':[], 'Sum':[]
+    'o15Home':[], 'totalHome':[], 'AvgHome':[], 
+    'o15Away':[], 'totalAway':[], 'AvgAway':[], 
+    'pHome':[], 'pAway':[], 'pSum':[],
+    'avgSum':[]
 }
 
 for link in tqdm(id_jogos, total=len(id_jogos)):
@@ -137,17 +138,17 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
             # print(f'{index}: {sublink}results/') # English
             for i in jogos:
                 try:
-                    golsHome = i.find_element(By.CSS_SELECTOR, 'div.event__part--home').text
-                    golsHome = int(golsHome[1:2])
+                    golsHome = i.find_element(By.CSS_SELECTOR, 'div.event__score--home').text
+                    golsHome = int(golsHome)
                     gols += golsHome
-                    golsAway = i.find_element(By.CSS_SELECTOR, 'div.event__part--away').text
-                    golsAway = int(golsAway[1:2])
+                    golsAway = i.find_element(By.CSS_SELECTOR, 'div.event__score--away').text
+                    golsAway = int(golsAway)
                     gols += golsAway
                     # print(f'{golsHome}x{golsAway} ', end="")
                     total += 1
-                    if((golsHome+golsAway) > 0):
+                    if((golsHome+golsAway) > 1.5):
                         golsht += 1
-                    if(total>=15):
+                    if(total>=30):
                         break
                 except:
                     # print(f'?x? ', end="")
@@ -180,16 +181,19 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
     jogo['League'].append(League.replace(";", "-"))
     jogo['Home'].append(Home.replace(";", "-"))
     jogo['Away'].append(Away.replace(";", "-"))
-    jogo['golshtHome'].append(golshtHome)
+    jogo['o15Home'].append(golshtHome)
     jogo['totalHome'].append(totalHome)
     jogo['AvgHome'].append(str(round(mediaGolsHTHome, 4)).replace(".", ","))
-    jogo['golshtAway'].append(golshtAway)
+    jogo['o15Away'].append(golshtAway)
     jogo['totalAway'].append(totalAway)
     jogo['AvgAway'].append(str(round(mediaGolsHTAway, 4)).replace(".", ","))
     jogo['pHome'].append(str(round(pHome, 4)).replace(".", ","))
     jogo['pAway'].append(str(round(pAway, 4)).replace(".", ","))
-    jogo['Sum'].append(
+    jogo['pSum'].append(
         str(round((round(pHome, 4) + round(pAway, 4)), 4)).replace(".", ",")
+        )
+    jogo['avgSum'].append(
+        str(round((round(mediaGolsHTHome, 4) + round(mediaGolsHTAway, 4)), 4)).replace(".", ",")
         )
     
 df = pd.DataFrame(jogo)
@@ -197,5 +201,5 @@ df.reset_index(inplace=True, drop=True)
 df.index = df.index.set_names(['Nº'])
 df = df.rename(index=lambda x: x + 1)
 # print(df)
-filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_last15_O05HT.csv"
+filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_last30_O15FT.csv"
 df.to_csv(filename, sep=";")

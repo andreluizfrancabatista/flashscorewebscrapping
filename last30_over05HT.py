@@ -147,7 +147,7 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
                     total += 1
                     if((golsHome+golsAway) > 0):
                         golsht += 1
-                    if(total>=15):
+                    if(total>=30):
                         break
                 except:
                     # print(f'?x? ', end="")
@@ -197,5 +197,5 @@ df.reset_index(inplace=True, drop=True)
 df.index = df.index.set_names(['Nº'])
 df = df.rename(index=lambda x: x + 1)
 # print(df)
-filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_last15_O05HT.csv"
+filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_last30_O05HT.csv"
 df.to_csv(filename, sep=";")
