@@ -37,3 +37,7 @@ A fazer
 - Ao que tudo indica, estou usando uma única instância do driver para fazer o scrap
 - O ideal seria abrir mais de uma instância.
 
+----------------------
+Testar método para over 1,5 gols FT
+- Last 15 matches, acima de 13 matches com over 1,5 gols
+- Last 15 matches, média total de gols (marcados e sofridos) acima de 2,6
