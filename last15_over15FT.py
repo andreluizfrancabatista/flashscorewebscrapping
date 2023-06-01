@@ -197,6 +197,7 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
         )
     
 df = pd.DataFrame(jogo)
+df = df.sort_values(by=['pSum'], ascending=False)
 df.reset_index(inplace=True, drop=True)
 df.index = df.index.set_names(['Nº'])
 df = df.rename(index=lambda x: x + 1)
