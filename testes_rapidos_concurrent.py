@@ -160,6 +160,11 @@ if __name__ == '__main__':
     wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
     time.sleep(2)
 
+    # Abrir os jogos fechados
+    display_matches = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__info')
+    for button in display_matches:
+        wd_Chrome.execute_script("arguments[0].click();", button)
+
     # Pegando o ID dos Jogos
     id_jogos = []
     ## Para jogos agendados (próximos)
@@ -209,7 +214,7 @@ if __name__ == '__main__':
     df.reset_index(inplace=True, drop=True)
     df.index = df.index.set_names(['Nº'])
     df = df.rename(index=lambda x: x + 1)
-    filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_last15_O05HT_concurrent.csv"
+    filename = "lista_de_jogos/jogos_do_dia_"+Date.replace("/", "_")+"_last15_O05HT_concurrent.csv"
     df.to_csv(filename, sep=";")
 
     print(f'% Futures: --- {time.time() - start_time} seconds --- %')
