@@ -46,6 +46,12 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 def getinfo(driver, link):
+    jogo = {
+        'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],
+        'golshtHome':[], 'totalHome':[], 'AvgHome':[], 
+        'golshtAway':[], 'totalAway':[], 'AvgAway':[], 
+        'pHome':[], 'pAway':[], 'Sum':[]
+    }
     wd_Chrome = driver
     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary/') # English
     try:
@@ -62,10 +68,66 @@ def getinfo(driver, link):
         LinkAway = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName')
         LinkAway = LinkAway.find_element(By.TAG_NAME, 'a').get_attribute('href')
         Away = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
+        # Calcular a porcentagem de over 0,5 no HT de cada time
+        links = [LinkHome, LinkAway]
+        for index, sublink in enumerate(links):
+            wd_Chrome.get(f'{sublink}results/') # English
+            jogos = wd_Chrome.find_elements(By.CSS_SELECTOR,'div.event__match--static') #OR 'div.event__match--last'
+            total, golsht = 0, 0
+            gols = 0
+            # print(f'{index}: {sublink}results/') # English
+            for i in jogos:
+                try:
+                    golsHome = i.find_element(By.CSS_SELECTOR, 'div.event__part--home').text
+                    golsHome = int(golsHome[1:2])
+                    gols += golsHome
+                    golsAway = i.find_element(By.CSS_SELECTOR, 'div.event__part--away').text
+                    golsAway = int(golsAway[1:2])
+                    gols += golsAway
+                    # print(f'{golsHome}x{golsAway} ', end="")
+                    total += 1
+                    if((golsHome+golsAway) > 0):
+                        golsht += 1
+                    if(total>=15):
+                        break
+                except:
+                    # print(f'?x? ', end="")
+                    pass
+            # print()
+            if(index==0):
+                pHome = golsht/total
+                totalHome = total
+                golshtHome = golsht
+                mediaGolsHTHome = gols/total
+                # print(f'pHome:{pHome*100:.2f} jogos:{totalHome} jogosComGolHT:{golshtHome} média:{mediaGolsHTHome:.2f} gols:{gols}')
+            if(index==1):
+                pAway = golsht/total
+                totalAway = total
+                golshtAway = golsht
+                mediaGolsHTAway = gols/total
+                # print(f'pAway:{pAway*100:.2f} jogos:{totalAway} jogosComGolHT:{golshtAway} média:{mediaGolsHTAway:.2f} gols:{gols}')
+            # print()  
     except:
         pass
-    # print(f'{Date}, {Time}, {Country}, {League}\n{Home} x {Away}\n') 
-    return [Date, Time, Country, League, Home, Away]
+    # print(f'{Date}, {Time}, {Country}, {League}\n{Home} x {Away}\n')
+    jogo['Date'].append(Date.replace(".", "/"))
+    jogo['Time'].append(Time)
+    jogo['Country'].append(Country.replace(";", "-"))
+    jogo['League'].append(League.replace(";", "-"))
+    jogo['Home'].append(Home.replace(";", "-"))
+    jogo['Away'].append(Away.replace(";", "-"))
+    jogo['golshtHome'].append(golshtHome)
+    jogo['totalHome'].append(totalHome)
+    jogo['AvgHome'].append(str(round(mediaGolsHTHome, 4)).replace(".", ","))
+    jogo['golshtAway'].append(golshtAway)
+    jogo['totalAway'].append(totalAway)
+    jogo['AvgAway'].append(str(round(mediaGolsHTAway, 4)).replace(".", ","))
+    jogo['pHome'].append(str(round(pHome, 4)).replace(".", ","))
+    jogo['pAway'].append(str(round(pAway, 4)).replace(".", ","))
+    jogo['Sum'].append(
+        str(round((round(pHome, 4) + round(pAway, 4)), 4)).replace(".", ",")
+        )
+    return jogo
 
 if __name__ == '__main__':
     # Instanciando o Objeto ChromeOptions
@@ -112,9 +174,10 @@ if __name__ == '__main__':
     # Exemplo de ID de um jogo: 'g_1_Gb7buXVt'    
     id_jogos = [i[4:] for i in id_jogos]
 
-    # Limitar o tamanho em 100
-    if(len(id_jogos)>100):
-        id_jogos = id_jogos[:100]
+    # Limitar o tamanho da análise
+    # lim = 5
+    # if(len(id_jogos)>lim):
+    #     id_jogos = id_jogos[:lim]
 
     # Exibir a quantidade de jogos coletados
     print(f'Jogos: {len(id_jogos)}')
@@ -132,12 +195,37 @@ if __name__ == '__main__':
             
     wait(futures)
     
+    df = pd.DataFrame()
     for future in futures:
         try:
-            print(future.result())
+            # print(future.result())
+            df2 = pd.DataFrame(future.result())
+            df = df.append(df2, ignore_index=True)
         except:
             pass
+
+    Date = df['Date'].values[0]
+    df = df.sort_values(by=['Sum'], ascending=False)
+    df.reset_index(inplace=True, drop=True)
+    df.index = df.index.set_names(['Nº'])
+    df = df.rename(index=lambda x: x + 1)
+    filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_last15_O05HT_concurrent.csv"
+    df.to_csv(filename, sep=";")
+
     print(f'% Futures: --- {time.time() - start_time} seconds --- %')
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # pool = ThreadPoolExecutor(max_workers=4)
     # results = pool.map(getinfo, id_jogos)
