@@ -64,8 +64,12 @@ wd_Chrome.get("https://www.flashscore.com/")
 time.sleep(2)
 
 ## Para jogos do dia seguinte / Comentar essa linha para os jogos agendados de hoje 
-wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
-time.sleep(2)
+# wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
+# time.sleep(2)
+
+# next_day = wd_Chrome.find_elements(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow')
+# for button in next_day:
+#     wd_Chrome.execute_script("arguments[0].click();", button)
 
 # Abrir os jogos fechados
 display_matches = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__info')
