@@ -67,9 +67,9 @@ time.sleep(2)
 # wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
 # time.sleep(2)
 
-# next_day = wd_Chrome.find_elements(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow')
-# for button in next_day:
-#     wd_Chrome.execute_script("arguments[0].click();", button)
+next_day = wd_Chrome.find_elements(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow')
+for button in next_day:
+    wd_Chrome.execute_script("arguments[0].click();", button)
 
 # Abrir os jogos fechados
 display_matches = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__info')
@@ -171,7 +171,7 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
                 # print(f'pAway:{pAway*100:.2f} jogos:{totalAway} jogosComGolHT:{golshtAway} média:{mediaGolsHTAway:.2f} gols:{gols}')
             # print()       
     except:
-        print(f'\nExcept: {link}')
+        print(f'\nExcept: {Home} x {Away}')
         pass
 
     # print(Date,Time,Country,League,Home,Away,Odds_H,Odds_D,Odds_A) 

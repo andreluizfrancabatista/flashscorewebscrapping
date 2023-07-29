@@ -57,6 +57,17 @@ import time
 from tqdm import tqdm
 from selenium.webdriver.common.by import By
 
+# Dict com os dias da semana e as siglas
+week = {
+    "SU": "Sunday",
+    "MO": "Monday",
+    "TU": "Tuesday",
+    "WE": "Wednesday",
+    "TH": "Thrusday",
+    "FR": "Friday",
+    "SA": "Saturday"
+}
+
 """# Iniciando a Raspagem de Dados"""
 
 # Com o WebDrive a gente consegue a pedir a página (URL)
@@ -67,9 +78,14 @@ time.sleep(2)
 # wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
 # time.sleep(2)
 
-next_day = wd_Chrome.find_elements(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow')
-for button in next_day:
-    wd_Chrome.execute_script("arguments[0].click();", button)
+# next_day = wd_Chrome.find_elements(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow')
+# for button in next_day:
+#     wd_Chrome.execute_script("arguments[0].click();", button)
+# time.sleep(2)
+
+# Identificar o dia dos jogos
+Date = wd_Chrome.find_element(By.CSS_SELECTOR, 'button#calendarMenu').text
+print(f'Jogos do dia {Date[0:5]} {week[Date[6:]]}')
 
 # Abrir os jogos fechados
 display_matches = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__info')
@@ -94,26 +110,27 @@ id_jogos = [i[4:] for i in id_jogos]
 jogo = {
     'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],
     'golsHome':[], 'totalHome':[], 'AvgHome':[], 
-    'golsAway':[], 'totalAway':[], 'AvgAway':[]
+    'golsAway':[], 'totalAway':[], 'AvgAway':[],
+    'avgSum':[]
 }
-
-
-# Parei aqui
-
-
 
 for link in tqdm(id_jogos, total=len(id_jogos)):
 # for i, link in enumerate(id_jogos):
 #     if(i>4):
 #         break
-    wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary/') # English
-    
-    total, golsht = 0, 0
-    golsHome, golsAway = 0, 0
-    golshtAway, golshtHome = 0, 0
-    mediaGolsHTHome, mediaGolsHTAway = 0, 0
-    totalHome, totalAway = 0, 0
-    pHome, pAway = 0, 0
+    wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/standings/live') # English
+    # time.sleep(2) # Testar o wait until 'div.table__row--selected'
+    try:
+        element = WebDriverWait(wd_Chrome, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, 'div.table__row--selected'))
+        )
+    except:
+        continue
+
+    # golsHome, golsAway = 0, 0
+    # totalHome, totalAway = 0, 0
+    # AvgHome, AvgAway = 0, 0
+    gols, total, avg = 0, 0, 0
     # Pegando as Informacoes Básicas do Jogo
     try:
         Date = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__startTime').text.split(' ')[0]
@@ -122,64 +139,51 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
         League = wd_Chrome.find_element(By.CSS_SELECTOR,'span.tournamentHeader__country')
         League = League.find_element(By.CSS_SELECTOR,'a').text
         Home = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__home')
-        LinkHome = Home.find_element(By.CSS_SELECTOR,'div.participant__participantName')
-        LinkHome = LinkHome.find_element(By.TAG_NAME, 'a').get_attribute('href')
         Home = Home.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
         Away = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__away')
-        LinkAway = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName')
-        LinkAway = LinkAway.find_element(By.TAG_NAME, 'a').get_attribute('href')
         Away = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
         
-        total, golsht = 0, 0
-        golsHome, golsAway = 0, 0
-        golshtAway, golshtHome = 0, 0
-        mediaGolsHTHome, mediaGolsHTAway = 0, 0
-        totalHome, totalAway = 0, 0
-        pHome, pAway = 0, 0
-        # Calcular a porcentagem de over 0,5 no HT de cada time
-        links = [LinkHome, LinkAway]
-        for index, sublink in enumerate(links):
-            wd_Chrome.get(f'{sublink}results/') # English
-            jogos = wd_Chrome.find_elements(By.CSS_SELECTOR,'div.event__match--static') #OR 'div.event__match--last'
-            total, golsht = 0, 0
-            gols = 0
-            # print(f'{index}: {sublink}results/') # English
-            for i in jogos:
-                try:
-                    golsHome = i.find_element(By.CSS_SELECTOR, 'div.event__score--home').text
-                    golsHome = int(golsHome)
-                    gols += golsHome
-                    golsAway = i.find_element(By.CSS_SELECTOR, 'div.event__score--away').text
-                    golsAway = int(golsAway)
-                    gols += golsAway
-                    # print(f'{golsHome}x{golsAway} ', end="")
-                    total += 1
-                    if((golsHome+golsAway) > 1.5):
-                        golsht += 1
-                    if(total>=30):
-                        break
-                except:
-                    # print(f'?x? ', end="")
-                    pass
-            # print()
-            if(index==0):
-                pHome = golsht/total
-                totalHome = total
-                golshtHome = golsht
-                mediaGolsHTHome = gols/total
-                # print(f'pHome:{pHome*100:.2f} jogos:{totalHome} jogosComGolHT:{golshtHome} média:{mediaGolsHTHome:.2f} gols:{gols}')
-            if(index==1):
-                pAway = golsht/total
-                totalAway = total
-                golshtAway = golsht
-                mediaGolsHTAway = gols/total
-                # print(f'pAway:{pAway*100:.2f} jogos:{totalAway} jogosComGolHT:{golshtAway} média:{mediaGolsHTAway:.2f} gols:{gols}')
-            # print()       
+        # golsHome, golsAway = 0, 0
+        # totalHome, totalAway = 0, 0
+        # AvgHome, AvgAway = 0, 0
+        gols, total, avg = 0, 0, 0
+        
+        # Pegar os gols marcados do time da casa
+        # info[0] é o time melhor classificado na tabela
+        # info[1] é o time pior classificado na tabela
+        # Como identificar quem é o mandante?
+
+        infodict = {}
+        infodict[Home] = {}
+        infodict[Away] = {}
+
+        infos = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.table__row--selected') # Pegar as duas div.table__row--selected
+        for info in infos:
+            name = info.find_element(By.CSS_SELECTOR, 'a.tableCellParticipant__name').text # Pegar o nome do primeiro time 
+            gols = info.find_element(By.CSS_SELECTOR, 'span.table__cell--score').text # Pegar os gols marcardos X:Y (X=marcados, Y=sofridos)
+            gols = int(gols.split(":")[0]) # [0] são os gols marcados, [1] são os gols sofridos
+            total = info.find_element(By.CSS_SELECTOR, 'span.table__cell--value').text # Pegar o total de partidas div.table_cell--value [0]
+            total = int(total)
+            if (total > 0):
+                avg = gols/total # Cálculo da média de gols marcados por partida
+            infodict[name]['gols'] = gols
+            infodict[name]['total'] = total
+            infodict[name]['avg'] = avg
+
+        # Pegar os gols marcados do time de fora
+        # info = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.table__row--selected')[1] # Pegar a div.table__row--selected
+        # golsAway = info.find_element(By.CSS_SELECTOR, 'span.table__cell--score').text # Pegar os gols marcardos X:Y (X=marcados, Y=sofridos)
+        # golsAway = int(golsAway.split(":")[0]) # [0] são os gols marcados, [1] são os gols sofridos
+        # totalAway = info.find_element(By.CSS_SELECTOR, 'span.table__cell--value').text # Pegar o total de partidas div.table_cell--value [0]
+        # totalAway = int(totalAway)
+        # if (totalAway > 0):
+        #     AvgAway = golsAway/totalAway # Cálculo da média de gols marcados por partida
+       
     except:
-        print(f'\nExcept: {link}')
+        print(f'\nExcept: {Home} x {Away} - {link}')
         pass
 
-    # print(Date,Time,Country,League,Home,Away,Odds_H,Odds_D,Odds_A) 
+    # print(Date,Time,Country,League,Home,Away,golsHome,totalHome,AvgHome, golsAway, totalAway, AvgAway) 
     # print(f'{Date}, {Time}, {Country}, {League}\n{Home} {pHome*100:.2f} x {pAway*100:.2f} {Away}\n') 
 
     # Colocar tudo dentro do df pra salvar no csv
@@ -189,26 +193,21 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
     jogo['League'].append(League.replace(";", "-"))
     jogo['Home'].append(Home.replace(";", "-"))
     jogo['Away'].append(Away.replace(";", "-"))
-    jogo['o15Home'].append(golshtHome)
-    jogo['totalHome'].append(totalHome)
-    jogo['AvgHome'].append(str(round(mediaGolsHTHome, 4)).replace(".", ","))
-    jogo['o15Away'].append(golshtAway)
-    jogo['totalAway'].append(totalAway)
-    jogo['AvgAway'].append(str(round(mediaGolsHTAway, 4)).replace(".", ","))
-    jogo['pHome'].append(str(round(pHome, 4)).replace(".", ","))
-    jogo['pAway'].append(str(round(pAway, 4)).replace(".", ","))
-    jogo['pSum'].append(
-        str(round((round(pHome, 4) + round(pAway, 4)), 4)).replace(".", ",")
-        )
+    jogo['golsHome'].append(infodict[Home]['gols'])
+    jogo['totalHome'].append(infodict[Home]['total'])
+    jogo['AvgHome'].append(str(round(infodict[Home]['avg'], 4)).replace(".", ","))
+    jogo['golsAway'].append(infodict[Away]['gols'])
+    jogo['totalAway'].append(infodict[Away]['total'])
+    jogo['AvgAway'].append(str(round(infodict[Away]['avg'], 4)).replace(".", ","))
     jogo['avgSum'].append(
-        str(round((round(mediaGolsHTHome, 4) + round(mediaGolsHTAway, 4)), 4)).replace(".", ",")
+        str(round((round(infodict[Home]['avg'], 4) + round(infodict[Away]['avg'], 4)), 4)).replace(".", ",")
         )
     
 df = pd.DataFrame(jogo)
-df = df.sort_values(by=['pSum'], ascending=False)
+df = df.sort_values(by=['avgSum'], ascending=False)
 df.reset_index(inplace=True, drop=True)
 df.index = df.index.set_names(['Nº'])
 df = df.rename(index=lambda x: x + 1)
 # print(df)
-filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_last30_U25FT.csv"
+filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_golsFT.csv"
 df.to_csv(filename, sep=";")
