@@ -109,8 +109,8 @@ id_jogos = [i[4:] for i in id_jogos]
 #Procurar somente por gols marcados
 jogo = {
     'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],
-    'golsHome':[], 'totalHome':[], 'AvgHome':[], 
-    'golsAway':[], 'totalAway':[], 'AvgAway':[],
+    'golsHome':[], 'jogosHome':[], 'AvgHome':[], 
+    'golsAway':[], 'jogosAway':[], 'AvgAway':[],
     'avgSum':[]
 }
 
@@ -118,8 +118,10 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
 # for i, link in enumerate(id_jogos):
 #     if(i>4):
 #         break
+    if (link == "fg0LToAh"):
+        continue
     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/standings/live') # English
-    # time.sleep(2) # Testar o wait until 'div.table__row--selected'
+    # time.sleep(2)
     try:
         element = WebDriverWait(wd_Chrome, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, 'div.table__row--selected'))
@@ -127,9 +129,6 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
     except:
         continue
 
-    # golsHome, golsAway = 0, 0
-    # totalHome, totalAway = 0, 0
-    # AvgHome, AvgAway = 0, 0
     gols, total, avg = 0, 0, 0
     # Pegando as Informacoes Básicas do Jogo
     try:
@@ -142,16 +141,12 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
         Home = Home.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
         Away = wd_Chrome.find_element(By.CSS_SELECTOR,'div.duelParticipant__away')
         Away = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
-        
-        # golsHome, golsAway = 0, 0
-        # totalHome, totalAway = 0, 0
-        # AvgHome, AvgAway = 0, 0
+
         gols, total, avg = 0, 0, 0
         
-        # Pegar os gols marcados do time da casa
+        # Pegar os gols marcados do time da casa e visitante
         # info[0] é o time melhor classificado na tabela
         # info[1] é o time pior classificado na tabela
-        # Como identificar quem é o mandante?
 
         infodict = {}
         infodict[Home] = {}
@@ -159,7 +154,7 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
 
         infos = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.table__row--selected') # Pegar as duas div.table__row--selected
         for info in infos:
-            name = info.find_element(By.CSS_SELECTOR, 'a.tableCellParticipant__name').text # Pegar o nome do primeiro time 
+            name = info.find_element(By.CSS_SELECTOR, 'a.tableCellParticipant__name').text # Pegar o nome do time 
             gols = info.find_element(By.CSS_SELECTOR, 'span.table__cell--score').text # Pegar os gols marcardos X:Y (X=marcados, Y=sofridos)
             gols = int(gols.split(":")[0]) # [0] são os gols marcados, [1] são os gols sofridos
             total = info.find_element(By.CSS_SELECTOR, 'span.table__cell--value').text # Pegar o total de partidas div.table_cell--value [0]
@@ -169,15 +164,6 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
             infodict[name]['gols'] = gols
             infodict[name]['total'] = total
             infodict[name]['avg'] = avg
-
-        # Pegar os gols marcados do time de fora
-        # info = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.table__row--selected')[1] # Pegar a div.table__row--selected
-        # golsAway = info.find_element(By.CSS_SELECTOR, 'span.table__cell--score').text # Pegar os gols marcardos X:Y (X=marcados, Y=sofridos)
-        # golsAway = int(golsAway.split(":")[0]) # [0] são os gols marcados, [1] são os gols sofridos
-        # totalAway = info.find_element(By.CSS_SELECTOR, 'span.table__cell--value').text # Pegar o total de partidas div.table_cell--value [0]
-        # totalAway = int(totalAway)
-        # if (totalAway > 0):
-        #     AvgAway = golsAway/totalAway # Cálculo da média de gols marcados por partida
        
     except:
         print(f'\nExcept: {Home} x {Away} - {link}')
@@ -187,21 +173,25 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
     # print(f'{Date}, {Time}, {Country}, {League}\n{Home} {pHome*100:.2f} x {pAway*100:.2f} {Away}\n') 
 
     # Colocar tudo dentro do df pra salvar no csv
-    jogo['Date'].append(Date.replace(".", "/"))
-    jogo['Time'].append(Time)
-    jogo['Country'].append(Country.replace(";", "-"))
-    jogo['League'].append(League.replace(";", "-"))
-    jogo['Home'].append(Home.replace(";", "-"))
-    jogo['Away'].append(Away.replace(";", "-"))
-    jogo['golsHome'].append(infodict[Home]['gols'])
-    jogo['totalHome'].append(infodict[Home]['total'])
-    jogo['AvgHome'].append(str(round(infodict[Home]['avg'], 4)).replace(".", ","))
-    jogo['golsAway'].append(infodict[Away]['gols'])
-    jogo['totalAway'].append(infodict[Away]['total'])
-    jogo['AvgAway'].append(str(round(infodict[Away]['avg'], 4)).replace(".", ","))
-    jogo['avgSum'].append(
-        str(round((round(infodict[Home]['avg'], 4) + round(infodict[Away]['avg'], 4)), 4)).replace(".", ",")
-        )
+    try:
+        jogo['Date'].append(Date.replace(".", "/"))
+        jogo['Time'].append(Time)
+        jogo['Country'].append(Country.replace(";", "-"))
+        jogo['League'].append(League.replace(";", "-"))
+        jogo['Home'].append(Home.replace(";", "-"))
+        jogo['Away'].append(Away.replace(";", "-"))
+        jogo['golsHome'].append(infodict[Home]['gols'])
+        jogo['jogosHome'].append(infodict[Home]['total'])
+        jogo['AvgHome'].append(str(round(infodict[Home]['avg'], 4)).replace(".", ","))
+        jogo['golsAway'].append(infodict[Away]['gols'])
+        jogo['jogosAway'].append(infodict[Away]['total'])
+        jogo['AvgAway'].append(str(round(infodict[Away]['avg'], 4)).replace(".", ","))
+        jogo['avgSum'].append(
+            str(round((round(infodict[Home]['avg'], 4) + round(infodict[Away]['avg'], 4)), 4)).replace(".", ",")
+            )
+    except:
+        print(f'\nErro no append: {Home} x {Away} - {link}')
+        pass
     
 df = pd.DataFrame(jogo)
 df = df.sort_values(by=['avgSum'], ascending=False)
