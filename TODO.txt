@@ -1,3 +1,4 @@
 TODO
 - Fazer um código pra identificar UNDER 2.5 gols
 -- Checar jogo a jogo pelos piores ataques no FT
+- Fazer um código para checar top3 vs bot3

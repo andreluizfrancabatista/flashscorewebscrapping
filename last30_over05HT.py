@@ -83,11 +83,6 @@ for button in next_day:
     wd_Chrome.execute_script("arguments[0].click();", button)
 time.sleep(2)
 
-next_day = wd_Chrome.find_elements(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow')
-for button in next_day:
-    wd_Chrome.execute_script("arguments[0].click();", button)
-time.sleep(2)
-
 # Identificar o dia dos jogos
 Date = wd_Chrome.find_element(By.CSS_SELECTOR, 'button#calendarMenu').text
 print(f'Jogos do dia {Date[0:5]} {week[Date[6:]]}')
@@ -113,9 +108,10 @@ id_jogos = [i[4:] for i in id_jogos]
 
 jogo = {
     'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],
-    'golshtHome':[], 'totalHome':[], 'AvgHome':[], 
-    'golshtAway':[], 'totalAway':[], 'AvgAway':[], 
-    'pHome':[], 'pAway':[], 'Sum':[]
+    'golshtHome':[], 'totalHome':[], 
+    'golshtAway':[], 'totalAway':[], 
+    'pHome':[], 'pAway':[], 'pSum':[],
+    'avgHome':[], 'avgAway':[], 'avgSum':[]
 }
 
 for link in tqdm(id_jogos, total=len(id_jogos)):
@@ -207,14 +203,17 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
     jogo['Away'].append(Away.replace(";", "-"))
     jogo['golshtHome'].append(golshtHome)
     jogo['totalHome'].append(totalHome)
-    jogo['AvgHome'].append(str(round(mediaGolsHTHome, 4)).replace(".", ","))
     jogo['golshtAway'].append(golshtAway)
     jogo['totalAway'].append(totalAway)
-    jogo['AvgAway'].append(str(round(mediaGolsHTAway, 4)).replace(".", ","))
     jogo['pHome'].append(str(round(pHome, 4)).replace(".", ","))
     jogo['pAway'].append(str(round(pAway, 4)).replace(".", ","))
-    jogo['Sum'].append(
+    jogo['pSum'].append(
         str(round((round(pHome, 4) + round(pAway, 4)), 4)).replace(".", ",")
+        )
+    jogo['avgHome'].append(str(round(mediaGolsHTHome, 4)).replace(".", ","))
+    jogo['avgAway'].append(str(round(mediaGolsHTAway, 4)).replace(".", ","))
+    jogo['avgSum'].append(
+        str(round((round(mediaGolsHTHome, 4) + round(mediaGolsHTAway, 4)), 4)).replace(".", ",")
         )
     
 df = pd.DataFrame(jogo)

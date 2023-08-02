@@ -83,11 +83,6 @@ for button in next_day:
     wd_Chrome.execute_script("arguments[0].click();", button)
 time.sleep(2)
 
-for button in next_day:
-    wd_Chrome.execute_script("arguments[0].click();", button)
-time.sleep(2)
-
-
 # Identificar o dia dos jogos
 Date = wd_Chrome.find_element(By.CSS_SELECTOR, 'button#calendarMenu').text
 print(f'Jogos do dia {Date[0:5]} {week[Date[6:]]}')
