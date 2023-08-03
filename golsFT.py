@@ -78,10 +78,10 @@ time.sleep(2)
 # wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
 # time.sleep(2)
 
-next_day = wd_Chrome.find_elements(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow')
-for button in next_day:
-    wd_Chrome.execute_script("arguments[0].click();", button)
-time.sleep(2)
+# next_day = wd_Chrome.find_elements(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow')
+# for button in next_day:
+#     wd_Chrome.execute_script("arguments[0].click();", button)
+# time.sleep(2)
 
 # Identificar o dia dos jogos
 Date = wd_Chrome.find_element(By.CSS_SELECTOR, 'button#calendarMenu').text
@@ -118,7 +118,7 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
 # for i, link in enumerate(id_jogos):
 #     if(i>4):
 #         break
-    if(link=="6e8uQKV6"):
+    if(link == "Qo0XRt1f" or link == "8AkxR0G0" or link == "6e8uQKV6"):
         continue
     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/standings/live') # English
     # time.sleep(2)

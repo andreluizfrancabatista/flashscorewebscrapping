@@ -25,7 +25,7 @@ Criado por:
 # !cp /usr/lib/chromium-browser/chromedriver /usr/bin
 import sys
 sys.path.insert(0,'/usr/lib/chromium-browser/chromedriver')
-
+import os
 """# Configuração do Web-Driver"""
 
 # Utilizando o WebDriver do Selenium
@@ -114,12 +114,10 @@ jogo = {
     'avgHome':[], 'avgAway':[], 'avgSum':[]
 }
 
-for link in tqdm(id_jogos, total=len(id_jogos)):
+for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
 # for i, link in enumerate(id_jogos):
 #     if(i>4):
 #         break
-    if(link=="6e8uQKV6"):
-        continue
     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary/') # English
     
     total, golsht = 0, 0
@@ -218,11 +216,18 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
         str(round((round(mediaGolsHTHome, 4) + round(mediaGolsHTAway, 4)), 4)).replace(".", ",")
         )
     
+
+# Para atualizar o CSV a cada 'n' interações.
+# Colocar esse código abaixo dentro do loop acima (subir uma identação)
+# Colocar uma condição para a cada 'n' interações do loop, realizar a escrita no arquivo
 df = pd.DataFrame(jogo)
-df = df.sort_values(by=['Sum'], ascending=False)
+df = df.sort_values(by=['pSum'], ascending=False)
 df.reset_index(inplace=True, drop=True)
 df.index = df.index.set_names(['Nº'])
 df = df.rename(index=lambda x: x + 1)
-# print(df)
 filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_last30_O05HT.csv"
 df.to_csv(filename, sep=";")
+
+# Update the CSV
+# filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_last30_O05HT.csv"
+# df.to_csv(filename, mode='a', header=not os.path.exists(filename))
