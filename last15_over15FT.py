@@ -57,6 +57,17 @@ import time
 from tqdm import tqdm
 from selenium.webdriver.common.by import By
 
+# Dict com os dias da semana e as siglas
+week = {
+    "SU": "Sunday",
+    "MO": "Monday",
+    "TU": "Tuesday",
+    "WE": "Wednesday",
+    "TH": "Thrusday",
+    "FR": "Friday",
+    "SA": "Saturday"
+}
+
 """# Iniciando a Raspagem de Dados"""
 
 # Com o WebDrive a gente consegue a pedir a página (URL)
@@ -66,6 +77,15 @@ time.sleep(2)
 ## Para jogos do dia seguinte / Comentar essa linha para os jogos agendados de hoje 
 wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
 time.sleep(2)
+
+# next_day = wd_Chrome.find_elements(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow')
+# for button in next_day:
+#     wd_Chrome.execute_script("arguments[0].click();", button)
+# time.sleep(2)
+
+# Identificar o dia dos jogos
+Date = wd_Chrome.find_element(By.CSS_SELECTOR, 'button#calendarMenu').text
+print(f'Jogos do dia {Date[0:5]} {week[Date[6:]]}')
 
 # Abrir os jogos fechados
 display_matches = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__info')
@@ -155,10 +175,10 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
                     pass
             # print()
             if(index==0):
-                pHome = golsht/total
-                totalHome = total
-                golshtHome = golsht
-                mediaGolsHTHome = gols/total
+                pHome = golsht/total # porcentagem de jogos com mais de 1,5 gols
+                totalHome = total # total de jogos (15)
+                golshtHome = golsht # quantidade de jogos com mais de 1,5 gols
+                mediaGolsHTHome = gols/total # média de gols (marcados e sofridos) em todos os jogos (15)
                 # print(f'pHome:{pHome*100:.2f} jogos:{totalHome} jogosComGolHT:{golshtHome} média:{mediaGolsHTHome:.2f} gols:{gols}')
             if(index==1):
                 pAway = golsht/total
@@ -197,6 +217,12 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
         )
     
 df = pd.DataFrame(jogo)
+
+# Drop rows totalHome < 10 or totalAway < 10
+filtered = df[ (df['totalHome'] < 15) | (df['totalAway'] < 15) ].index
+df.drop(filtered , inplace=True)
+
+
 df = df.sort_values(by=['pSum'], ascending=False)
 df.reset_index(inplace=True, drop=True)
 df.index = df.index.set_names(['Nº'])

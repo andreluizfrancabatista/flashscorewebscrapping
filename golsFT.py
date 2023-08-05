@@ -78,10 +78,10 @@ time.sleep(2)
 # wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
 # time.sleep(2)
 
-# next_day = wd_Chrome.find_elements(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow')
-# for button in next_day:
-#     wd_Chrome.execute_script("arguments[0].click();", button)
-# time.sleep(2)
+next_day = wd_Chrome.find_elements(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow')
+for button in next_day:
+    wd_Chrome.execute_script("arguments[0].click();", button)
+time.sleep(2)
 
 # Identificar o dia dos jogos
 Date = wd_Chrome.find_element(By.CSS_SELECTOR, 'button#calendarMenu').text
@@ -106,7 +106,7 @@ for i in jogos:
 # Exemplo de ID de um jogo: 'g_1_Gb7buXVt'
 id_jogos = [i[4:] for i in id_jogos]
 
-#Procurar somente por gols marcados
+# Procurar por gols marcados e sofridos
 jogo = {
     'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],
     'golsHome':[], 'jogosHome':[], 'AvgHome':[], 
@@ -118,7 +118,7 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
 # for i, link in enumerate(id_jogos):
 #     if(i>4):
 #         break
-    if(link == "Qo0XRt1f" or link == "8AkxR0G0" or link == "6e8uQKV6"):
+    if (link == "AiH8P8dg" or link == "SSR3Qlsm" or link == "EPNaRURt" or link == "dzOTFqqL"):
         continue
     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/standings/live') # English
     # time.sleep(2)
@@ -156,7 +156,7 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
         for info in infos:
             name = info.find_element(By.CSS_SELECTOR, 'a.tableCellParticipant__name').text # Pegar o nome do time 
             gols = info.find_element(By.CSS_SELECTOR, 'span.table__cell--score').text # Pegar os gols marcardos X:Y (X=marcados, Y=sofridos)
-            gols = int(gols.split(":")[0]) # [0] são os gols marcados, [1] são os gols sofridos
+            gols = int(gols.split(":")[0]) # + int(gols.split(":")[1]) # [0] são os gols marcados, [1] são os gols sofridos
             total = info.find_element(By.CSS_SELECTOR, 'span.table__cell--value').text # Pegar o total de partidas div.table_cell--value [0]
             total = int(total)
             if (total > 0):
@@ -194,10 +194,15 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
         pass
     
 df = pd.DataFrame(jogo)
+
+# Drop rows totalHome < 10 or totalAway < 10
+filtered = df[ (df['jogosHome'] < 10) | (df['jogosAway'] < 10) ].index
+df.drop(filtered , inplace=True)
+
 df = df.sort_values(by=['avgSum'], ascending=False)
 df.reset_index(inplace=True, drop=True)
 df.index = df.index.set_names(['Nº'])
 df = df.rename(index=lambda x: x + 1)
 # print(df)
-filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_golsFT_2.csv"
+filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_golsFT.csv"
 df.to_csv(filename, sep=";")

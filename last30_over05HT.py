@@ -118,6 +118,8 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
 # for i, link in enumerate(id_jogos):
 #     if(i>4):
 #         break
+    if (link == "AiH8P8dg" or link == "SSR3Qlsm" or link == "EPNaRURt" or link == "dzOTFqqL"):
+        continue
     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary/') # English
     
     total, golsht = 0, 0
@@ -221,6 +223,11 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
 # Colocar esse código abaixo dentro do loop acima (subir uma identação)
 # Colocar uma condição para a cada 'n' interações do loop, realizar a escrita no arquivo
 df = pd.DataFrame(jogo)
+
+# Drop rows totalHome < 15 or totalAway < 15
+filtered = df[ (df['totalHome'] < 15) | (df['totalAway'] < 15) ].index
+df.drop(filtered , inplace=True)
+
 df = df.sort_values(by=['pSum'], ascending=False)
 df.reset_index(inplace=True, drop=True)
 df.index = df.index.set_names(['Nº'])
