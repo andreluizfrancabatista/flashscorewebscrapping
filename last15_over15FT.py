@@ -115,9 +115,6 @@ jogo = {
 }
 
 for link in tqdm(id_jogos, total=len(id_jogos)):
-# for i, link in enumerate(id_jogos):
-#     if(i>4):
-#         break
     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary/') # English
     
     total, golsht = 0, 0

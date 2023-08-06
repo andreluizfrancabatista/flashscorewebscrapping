@@ -115,11 +115,6 @@ jogo = {
 }
 
 for link in tqdm(id_jogos, total=len(id_jogos)):
-# for i, link in enumerate(id_jogos):
-#     if(i>4):
-#         break
-    if (link == "AiH8P8dg" or link == "SSR3Qlsm" or link == "EPNaRURt" or link == "dzOTFqqL"):
-        continue
     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/standings/live') # English
     # time.sleep(2)
     try:
@@ -190,7 +185,7 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
             str(round((round(infodict[Home]['avg'], 4) + round(infodict[Away]['avg'], 4)), 4)).replace(".", ",")
             )
     except:
-        print(f'\nErro no append: {Home} x {Away} - {link}')
+        print(f'\nErro no append: {Home} x {Away} - https://www.flashscore.com/match/{link}/#/standings/live\n{jogo}')
         pass
     
 df = pd.DataFrame(jogo)

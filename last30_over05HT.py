@@ -114,14 +114,17 @@ jogo = {
     'avgHome':[], 'avgAway':[], 'avgSum':[]
 }
 
+# Lista de países coletados
+Countries = ["BRAZIL", "GERMANY", "AUSTRIA", "CHINA"]
+
 for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
-# for i, link in enumerate(id_jogos):
-#     if(i>4):
-#         break
-    if (link == "AiH8P8dg" or link == "SSR3Qlsm" or link == "EPNaRURt" or link == "dzOTFqqL"):
-        continue
     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary/') # English
-    
+
+    # Checar se o país está na lista
+    # Country = wd_Chrome.find_element(By.CSS_SELECTOR,'span.tournamentHeader__country').text.split(':')[0]
+    # if Country not in Countries:
+    #     continue
+
     total, golsht = 0, 0
     golsHome, golsAway = 0, 0
     golshtAway, golshtHome = 0, 0
