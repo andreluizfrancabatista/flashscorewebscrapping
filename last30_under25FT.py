@@ -109,8 +109,8 @@ id_jogos = [i[4:] for i in id_jogos]
 
 jogo = {
     'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],
-    'golshtHome':[], 'totalHome':[], 
-    'golshtAway':[], 'totalAway':[], 
+    'jogosHome':[], 'totalHome':[], 
+    'jogosAway':[], 'totalAway':[], 
     'pHome':[], 'pAway':[], 'pSum':[],
     'avgHome':[], 'sdHome':[], 'avgAway':[], 'sdAway':[], 
     'avgSum':[]
@@ -126,6 +126,7 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
     # Country = wd_Chrome.find_element(By.CSS_SELECTOR,'span.tournamentHeader__country').text.split(':')[0]
     # if Country not in Countries:
     #     continue
+    
 
     total, golsht = 0, 0
     golsHome, golsAway = 0, 0
@@ -151,6 +152,16 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         LinkAway = LinkAway.find_element(By.TAG_NAME, 'a').get_attribute('href')
         Away = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
         
+        # Verificar se o nome do time tem (xxx) no final e remover
+        # if "(Am)" not in Home:
+        #     if ")" in Home[-1:]:
+        #         pos = Home.find('(')
+        #         Home = Home[:pos]
+        # if "(Am)" not in Away:
+        #     if ")" in Away[-1:]:
+        #         pos = Away.find('(')
+        #         Away = Away[:pos]
+        
         total, golsht = 0, 0
         golsHome, golsAway = 0, 0
         golshtAway, golshtHome = 0, 0
@@ -170,16 +181,16 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
             # print(f'{index}: {sublink}results/') # English
             for i in jogos:
                 try:
-                    golsHome = i.find_element(By.CSS_SELECTOR, 'div.event__part--home').text
-                    golsHome = int(golsHome[1:2])
+                    golsHome = i.find_element(By.CSS_SELECTOR, 'div.event__score--home').text
+                    golsHome = int(golsHome)
                     gols += golsHome
-                    golsAway = i.find_element(By.CSS_SELECTOR, 'div.event__part--away').text
-                    golsAway = int(golsAway[1:2])
+                    golsAway = i.find_element(By.CSS_SELECTOR, 'div.event__score--away').text
+                    golsAway = int(golsAway)
                     gols += golsAway
                     # print(f'{golsHome}x{golsAway} ', end="")
                     total += 1
                     golsArray.append(golsHome+golsAway)
-                    if((golsHome+golsAway) > 0):
+                    if((golsHome+golsAway) < 2.5):
                         golsht += 1
                     if(total>=30):
                         break
@@ -205,8 +216,8 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
                 sdAway = golsArray.std() # Calcular o SD de golsArray
                 # print(f'pAway:{pAway*100:.2f} jogos:{totalAway} jogosComGolHT:{golshtAway} média:{mediaGolsHTAway:.2f} gols:{gols}')
             # print()       
-    except:
-        print(f'\nExcept: {Home} x {Away} - {link}')
+    except Exception as error:
+        print(f'\n{error}\nExcept: {Home} x {Away} - {link}')
         pass
 
     # print(Date,Time,Country,League,Home,Away,Odds_H,Odds_D,Odds_A) 
@@ -219,9 +230,9 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
     jogo['League'].append(League.replace(";", "-"))
     jogo['Home'].append(Home.replace(";", "-"))
     jogo['Away'].append(Away.replace(";", "-"))
-    jogo['golshtHome'].append(golshtHome)
+    jogo['jogosHome'].append(golshtHome)
     jogo['totalHome'].append(totalHome)
-    jogo['golshtAway'].append(golshtAway)
+    jogo['jogosAway'].append(golshtAway)
     jogo['totalAway'].append(totalAway)
     jogo['pHome'].append(str(round(pHome, 4)).replace(".", ","))
     jogo['pAway'].append(str(round(pAway, 4)).replace(".", ","))
@@ -250,9 +261,5 @@ df = df.sort_values(by=['pSum'], ascending=False)
 df.reset_index(inplace=True, drop=True)
 df.index = df.index.set_names(['Nº'])
 df = df.rename(index=lambda x: x + 1)
-filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_last30_O05HT_com_SD.csv"
+filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_last30_U25FT_com_SD.csv"
 df.to_csv(filename, sep=";")
-
-# Update the CSV
-# filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_last30_O05HT.csv"
-# df.to_csv(filename, mode='a', header=not os.path.exists(filename))

@@ -25,7 +25,7 @@ Criado por:
 # !cp /usr/lib/chromium-browser/chromedriver /usr/bin
 import sys
 sys.path.insert(0,'/usr/lib/chromium-browser/chromedriver')
-
+import numpy as np
 """# Configuração do Web-Driver"""
 
 # Utilizando o WebDriver do Selenium
@@ -143,9 +143,19 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
         # info[0] é o time melhor classificado na tabela
         # info[1] é o time pior classificado na tabela
 
+        # Verificar se o nome do time tem (xxx) no final e remover
+        if "(Am)" not in Home:
+            if ")" in Home[-1:]:
+                pos = Home.find('(')
+                Home = Home[:pos]
+        if "(Am)" not in Away:
+            if ")" in Away[-1:]:
+                pos = Away.find('(')
+                Away = Away[:pos]
+        
         infodict = {}
-        infodict[Home] = {}
-        infodict[Away] = {}
+        infodict[Home] = {'gols':0, 'total':0, 'avg':0}
+        infodict[Away] = {'gols':0, 'total':0, 'avg':0}
 
         infos = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.table__row--selected') # Pegar as duas div.table__row--selected
         for info in infos:
@@ -160,8 +170,8 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
             infodict[name]['total'] = total
             infodict[name]['avg'] = avg
        
-    except:
-        print(f'\nExcept: {Home} x {Away} - {link}')
+    except Exception as error:
+        print(f'\nExcept: {Home} x {Away} - {link}\nError: {error}')
         pass
 
     # print(Date,Time,Country,League,Home,Away,golsHome,totalHome,AvgHome, golsAway, totalAway, AvgAway) 
@@ -184,8 +194,8 @@ for link in tqdm(id_jogos, total=len(id_jogos)):
         jogo['avgSum'].append(
             str(round((round(infodict[Home]['avg'], 4) + round(infodict[Away]['avg'], 4)), 4)).replace(".", ",")
             )
-    except:
-        print(f'\nErro no append: {Home} x {Away} - https://www.flashscore.com/match/{link}/#/standings/live\n{jogo}')
+    except Exception as error:
+        print(f'\n{error}\nErro no append: {Home} x {Away} - https://www.flashscore.com/match/{link}/#/standings/live')
         pass
     
 df = pd.DataFrame(jogo)
