@@ -5,3 +5,7 @@ TODO
 - Fazer um código para checar top3 vs bot3
 - Fazer um código para checar over  1,5 FT (marcados e sofridos) nos últimos 15 jogos
 - Fazer um código para checar under 2,5 FT (marcados e sofridos) nos últimos 15 jogos
+
+
+Essa ideia aqui é muito boa. Testar:
+https://medium.com/@fischiettigiulio/how-to-scrape-data-faster-with-selenium-and-parallel-scraping-advanced-98d4702f082

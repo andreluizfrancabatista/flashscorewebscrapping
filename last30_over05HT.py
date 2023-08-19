@@ -34,6 +34,10 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+
+
 
 # Instanciando o Objeto ChromeOptions
 options = webdriver.ChromeOptions()
@@ -49,14 +53,15 @@ options.add_argument('--log-level=3')
 
 
 # Criação do WebDriver do Chrome
-wd_Chrome = webdriver.Chrome('chromedriver',options=options)
+# wd_Chrome = webdriver.Chrome('chromedriver',options=options)
+wd_Chrome = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
 
 """# Importando as Bibliotecas"""
 
 import pandas as pd
 import time
 from tqdm import tqdm
-from selenium.webdriver.common.by import By
 
 # Dict com os dias da semana e as siglas
 week = {
@@ -205,8 +210,8 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
                 sdAway = golsArray.std() # Calcular o SD de golsArray
                 # print(f'pAway:{pAway*100:.2f} jogos:{totalAway} jogosComGolHT:{golshtAway} média:{mediaGolsHTAway:.2f} gols:{gols}')
             # print()       
-    except:
-        print(f'\nExcept: {Home} x {Away} - {link}')
+    except Exception as error:
+        print(f'\n{error}\nExcept: {Home} x {Away} - {link}')
         pass
 
     # print(Date,Time,Country,League,Home,Away,Odds_H,Odds_D,Odds_A) 
