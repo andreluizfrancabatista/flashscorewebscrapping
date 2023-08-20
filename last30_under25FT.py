@@ -34,6 +34,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 # Instanciando o Objeto ChromeOptions
 options = webdriver.ChromeOptions()
@@ -49,14 +51,15 @@ options.add_argument('--log-level=3')
 
 
 # Criação do WebDriver do Chrome
-wd_Chrome = webdriver.Chrome('chromedriver',options=options)
+# wd_Chrome = webdriver.Chrome('chromedriver',options=options)
+wd_Chrome = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
 
 """# Importando as Bibliotecas"""
 
 import pandas as pd
 import time
 from tqdm import tqdm
-from selenium.webdriver.common.by import By
 
 # Dict com os dias da semana e as siglas
 week = {
@@ -117,7 +120,7 @@ jogo = {
 }
 
 # Lista de países coletados
-Countries = ["BRAZIL", "GERMANY", "AUSTRIA", "CHINA"]
+# Countries = ["BRAZIL", "GERMANY", "AUSTRIA", "CHINA"]
 
 for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary/') # English
