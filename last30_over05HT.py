@@ -74,6 +74,9 @@ week = {
     "SA": "Saturday"
 }
 
+#Quantidade de jogos de cada time a serem analisados
+partidas = 20
+
 """# Iniciando a Raspagem de Dados"""
 
 # Com o WebDrive a gente consegue a pedir a página (URL)
@@ -186,7 +189,7 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
                     golsArray.append(golsHome+golsAway)
                     if((golsHome+golsAway) > 0):
                         golsht += 1
-                    if(total>=30):
+                    if(total>=partidas):
                         break
                 except:
                     # print(f'?x? ', end="")
@@ -255,7 +258,7 @@ df = df.sort_values(by=['pSum'], ascending=False)
 df.reset_index(inplace=True, drop=True)
 df.index = df.index.set_names(['Nº'])
 df = df.rename(index=lambda x: x + 1)
-filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_last30_O05HT_com_SD.csv"
+filename = "lista_de_jogos/jogos_do_dia_"+Date.replace(".", "_")+"_last"+str(partidas)+"_O05HT_com_SD.csv"
 df.to_csv(filename, sep=";")
 
 # Update the CSV
