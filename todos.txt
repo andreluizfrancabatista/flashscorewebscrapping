@@ -1,0 +1,9 @@
+- Fazer as simulações de Monte Carlo
+- Calcular a média de gols marcados pelo time da casa quando jogou em casa
+- Calcular a média de gols marcados pelo time de fora quando jogou em fora
+- Fazer a matriz de probabilidades de 0 a 6 gols
+- Somar as probabilidades de para os placares: 0-0, 1-0, 2-0, 0-1, 0-2, 1-1.
+
+Links úteis
+https://www.sciencedirect.com/topics/mathematics/poisson-distribution
+https://www.sciencedirect.com/book/9780128051634/optimal-sports-math-statistics-and-fantasy
