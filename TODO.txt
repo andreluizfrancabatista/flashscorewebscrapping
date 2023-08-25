@@ -9,3 +9,13 @@ TODO
 
 Essa ideia aqui é muito boa. Testar:
 https://medium.com/@fischiettigiulio/how-to-scrape-data-faster-with-selenium-and-parallel-scraping-advanced-98d4702f082
+
+
+--- Exception, division by zero, motivo: o nome do time na página match-summary está diferente da página de results. 
+como por exemplo: Liverpool (Ing) e Liverpool, OU vice-versa.
+Como arrumar, remover o (xxx) na página match-summary e também na página results/
+O código last20_montecarlo.py já está arrumado
+
+--- Exception, invalid literal for int() with base 10: '-'
+Motivo: um jogo sem placar, - x -
+Conferir se a informação extraída é int ou um hífen.
