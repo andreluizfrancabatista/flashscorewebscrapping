@@ -246,14 +246,14 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         df1 = pd.DataFrame(1, index=s1.index, columns=s2.index)
         new = round((df1.multiply(s1, axis='index') * s2 / 100),2)
         #
-        # Conferir aqui se os resultados não estão invertidos
+        # new[coluna][linha] - new[away][home]
         #
-        r0x0 = new[0][0] # 0x0
-        r0x1 = new[0][1] # 0x1
-        r0x2 = new[0][2] # 0x2
+        r0x0 = new[0][0] # 0x0 
+        r0x1 = new[1][0] # 0x1
+        r0x2 = new[2][0] # 0x2
         r1x1 = new[1][1] # 1x1
-        r1x0 = new[1][0] # 1x0
-        r2x0 = new[2][0] # 2x0
+        r1x0 = new[0][1] # 1x0
+        r2x0 = new[0][2] # 2x0
         rU25 = r0x0 + r0x1 + r0x2 + r1x1 + r1x0 + r2x0
 
     except Exception as error:

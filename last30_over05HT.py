@@ -125,15 +125,15 @@ jogo = {
 }
 
 # Lista de países coletados
-Countries = ["BRAZIL", "GERMANY", "AUSTRIA", "CHINA"]
+Countries = ["RUSSIA", "BELARUS", "UKRAINE"]
 
 for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary/') # English
 
     # Checar se o país está na lista
-    # Country = wd_Chrome.find_element(By.CSS_SELECTOR,'span.tournamentHeader__country').text.split(':')[0]
-    # if Country not in Countries:
-    #     continue
+    Country = wd_Chrome.find_element(By.CSS_SELECTOR,'span.tournamentHeader__country').text.split(':')[0]
+    if Country in Countries:
+        continue
 
     total, golsht = 0, 0
     golsHome, golsAway = 0, 0
@@ -158,6 +158,14 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         LinkAway = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName')
         LinkAway = LinkAway.find_element(By.TAG_NAME, 'a').get_attribute('href')
         Away = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
+
+        # Verificar se o nome do time tem (xxx) no final e remover
+        if ")" in Home:
+            pos = Home.find('(')
+            Home = Home[:pos-1]
+        if ")" in Away:
+            pos = Away.find('(')
+            Away = Away[:pos-1]
         
         total, golsht = 0, 0
         golsHome, golsAway = 0, 0
