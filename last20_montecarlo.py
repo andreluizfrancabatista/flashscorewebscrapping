@@ -106,7 +106,7 @@ jogo = {
     'Date': [], 'Time': [], 'Country': [], 'League': [], 'Home': [], 'Away': [],
     'golsHome': [], 'jogosHome': [], 'golsAway': [], 'jogosAway': [],
     'avgHome': [], 'sdHome': [], 'avgAway': [], 'sdAway': [], 'avgSum': [],
-    '0x0': [], '1x0': [], '2x0': [], '1x1': [], '0x1': [], '0x2': [], 'U25': []
+    '0x0': [], '1x0': [], '2x0': [], '1x1': [], '0x1': [], '0x2': [], 'U25': [], 'O25': []
 }
 
 # Lista de países vetados
@@ -119,7 +119,7 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
 
     # Checar se o país está na lista de vetados
     Country = wd_Chrome.find_element(By.CSS_SELECTOR, 'span.tournamentHeader__country').text.split(':')[0]
-    if Country in Countries:
+    if Country in Countries: # not in ["BRAZIL"]:
         continue
 
     # Pegando as Informacoes Básicas do Jogo
@@ -254,7 +254,21 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         r1x1 = new[1][1] # 1x1
         r1x0 = new[0][1] # 1x0
         r2x0 = new[0][2] # 2x0
-        rU25 = r0x0 + r0x1 + r0x2 + r1x1 + r1x0 + r2x0
+        # rU25 = r0x0 + r0x1 + r0x2 + r1x1 + r1x0 + r2x0
+
+        #
+        # Calcular U25 e O25
+        #
+        lim = 2.5
+        rU25 = 0
+        rO25 = 0
+        for h in range(0, ngols+1):
+            for a in range(0, ngols+1):
+                if(h + a < lim):
+                    rU25 += new[a][h]
+                else:
+                    rO25 += new[a][h]
+        
 
     except Exception as error:
         print(f'\n{error}\nExcept: {Home} x {Away} - {link}')
@@ -264,7 +278,7 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
     #     'Date': [], 'Time': [], 'Country': [], 'League': [], 'Home': [], 'Away': [],
     #     'golsHome': [], 'jogosHome': [], 'golsAway': [], 'jogosAway': [],
     #     'avgHome': [], 'sdHome': [], 'avgAway': [], 'sdAway': [], 'avgSum': [],
-    #     '0x0': [], '1x0': [], '2x0': [], '1x1': [], '0x1': [], '0x2': [], 'U25': []
+    #     '0x0': [], '1x0': [], '2x0': [], '1x1': [], '0x1': [], '0x2': [], 'U25': [], 'O25: []
     # }
 
     # Colocar tudo dentro do df pra salvar no csv
@@ -286,6 +300,7 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
     jogo['1x0'].append(str(round(r1x0, 4)).replace(".", ","))
     jogo['2x0'].append(str(round(r2x0, 4)).replace(".", ","))
     jogo['U25'].append(str(round(rU25, 4)).replace(".", ","))
+    jogo['O25'].append(str(round(rO25, 4)).replace(".", ","))
     
     jogo['avgHome'].append(str(round(mediaGolsHome, 4)).replace(".", ","))
     jogo['sdHome'].append(str(round(sdHome, 4)).replace(".", ","))
