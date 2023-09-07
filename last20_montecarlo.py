@@ -239,6 +239,7 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
 
 
         # Calcular as probabilidades pelo método de simulações de Monte Carlo
+        # Dúvida cruel? multiplicar ou somar????
         mean1 = mediaGolsHome + mediaGolsSofridosFora # gols marcados home + gols sofridos do visitante
         mean2 = mediaGolsAway + mediaGolsSofridosHome # gols marcados fora + gols sofridos do home
         ngols = 6
