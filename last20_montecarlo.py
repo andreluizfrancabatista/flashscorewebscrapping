@@ -60,7 +60,7 @@ week = {
 
 # Distribuição Poisson
 def poisson(x, mean):
-  return round(((math.exp(-mean) * (pow(mean, x)))/(math.factorial(x)) *100),2)
+  return ((math.exp(-mean) * (pow(mean, x)))/(math.factorial(x)) *100)
 
 partidas = 30
 
@@ -152,6 +152,7 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         gols = 0
         total = 0
         golsArrayHome = []
+        golsSofridosArray = []
         wd_Chrome.get(f'{LinkHome}results/')  # English
         # OR 'div.event__match--last'
         jogos = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__match--static')
@@ -164,11 +165,16 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
                     resultHome = resultHome[:pos-1]
                 if (Home == resultHome):
                     golsHome = i.find_element(By.CSS_SELECTOR, 'div.event__score--home').text
+                    golsSofridos = i.find_element(By.CSS_SELECTOR, 'div.event__score--away').text
                     if(golsHome != "-"):
+                        # gols marcardos em casa
                         golsHome = int(golsHome)
                         gols += golsHome
                         total += 1  # total de jogos que o time Home fez em casa dentro da lista de 30 jogos
                         golsArrayHome.append(golsHome)
+                        # gols sofridos em casa
+                        golsSofridos = int(golsSofridos)
+                        golsSofridosArray.append(golsSofridos)
                     if(total >= partidas):
                         break
             except Exception as error:
@@ -180,12 +186,18 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         mediaGolsHome = golsHome/jogosHome
         golsArrayHome = np.array(golsArrayHome)
         sdHome = golsArrayHome.std()  # Calcular o SD de golsArrayHome
+        # gols sofridos em casa
+        golsSofridosArray = np.array(golsSofridosArray)
+        mediaGolsSofridosHome = np.mean(golsSofridosArray)
+        sdGolsSofridosHome = golsSofridosArray.std()
+        
 
         ### AWAY ###
         # Inicializando variáveis de contagem
         gols = 0
         total = 0
         golsArrayAway = []
+        golsSofridosArray = []
         wd_Chrome.get(f'{LinkAway}results/')  # English
         # OR 'div.event__match--last'
         jogos = wd_Chrome.find_elements(
@@ -199,11 +211,16 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
                     resultAway = resultAway[:pos-1]
                 if (Away == resultAway):
                     golsAway = i.find_element(By.CSS_SELECTOR, 'div.event__score--away').text
+                    golsSofridos = i.find_element(By.CSS_SELECTOR, 'div.event__score--home').text
                     if(golsAway != "-"):
+                        # gols marcados visitante
                         golsAway = int(golsAway)
                         gols += golsAway
                         total += 1  # total de jogos que o time Away fez fora de casa dentro da lista de 30 jogos
                         golsArrayAway.append(golsAway)
+                        # gols sofridos visitante
+                        golsSofridos = int(golsSofridos)
+                        golsSofridosArray.append(golsSofridos)
                     if(total >= partidas):
                         break
             except Exception as error:
@@ -215,10 +232,15 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         mediaGolsAway = golsAway/jogosAway
         golsArrayAway = np.array(golsArrayAway)
         sdAway = golsArrayAway.std()  # Calcular o SD de golsArrayAway
+        # gols sofridos visitante
+        golsSofridosArray = np.array(golsSofridosArray) 
+        mediaGolsSofridosFora = np.mean(golsSofridosArray)
+        sdGolsSofridosAway = golsSofridosArray.std()
+
 
         # Calcular as probabilidades pelo método de simulações de Monte Carlo
-        mean1 = mediaGolsHome
-        mean2 = mediaGolsAway
+        mean1 = mediaGolsHome + mediaGolsSofridosFora # gols marcados home + gols sofridos do visitante
+        mean2 = mediaGolsAway + mediaGolsSofridosHome # gols marcados fora + gols sofridos do home
         ngols = 6
 
         probs = {
@@ -302,13 +324,13 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
     jogo['U25'].append(str(round(rU25, 4)).replace(".", ","))
     jogo['O25'].append(str(round(rO25, 4)).replace(".", ","))
     
-    jogo['avgHome'].append(str(round(mediaGolsHome, 4)).replace(".", ","))
-    jogo['sdHome'].append(str(round(sdHome, 4)).replace(".", ","))
-    jogo['avgAway'].append(str(round(mediaGolsAway, 4)).replace(".", ","))
-    jogo['sdAway'].append(str(round(sdAway, 4)).replace(".", ","))
+    jogo['avgHome'].append(str(round(mean1, 4)).replace(".", ","))
+    # jogo['sdHome'].append(str(round(sdHome, 4)).replace(".", ","))
+    jogo['avgAway'].append(str(round(mean2, 4)).replace(".", ","))
+    # jogo['sdAway'].append(str(round(sdAway, 4)).replace(".", ","))
     jogo['avgSum'].append(
         str(round(
-            (round(mediaGolsHome, 4) + round(mediaGolsAway, 4)), 4)
+            (round(mean1, 4) + round(mean2, 4)), 4)
             ).replace(".", ",")
     )
 
