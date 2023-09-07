@@ -74,10 +74,10 @@ time.sleep(2)
 # wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
 # time.sleep(2)
 
-next_day = wd_Chrome.find_elements(By.CSS_SELECTOR, 'button.calendar__navigation--tomorrow')
-for button in next_day:
-    wd_Chrome.execute_script("arguments[0].click();", button)
-time.sleep(2)
+# next_day = wd_Chrome.find_elements(By.CSS_SELECTOR, 'button.calendar__navigation--tomorrow')
+# for button in next_day:
+#     wd_Chrome.execute_script("arguments[0].click();", button)
+# time.sleep(2)
 
 # Identificar o dia dos jogos
 Date = wd_Chrome.find_element(By.CSS_SELECTOR, 'button#calendarMenu').text
@@ -87,11 +87,12 @@ print(f'Jogos do dia {Date[0:5]} {week[Date[6:]]}')
 display_matches = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__info')
 for button in display_matches:
     wd_Chrome.execute_script("arguments[0].click();", button)
+time.sleep(2)
 
 # Pegando o ID dos Jogos
 id_jogos = []
 # Para jogos agendados (próximos)
-jogos = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__match--scheduled')
+jogos = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__match--scheduled') #scheduled
 
 # Para jogos ao vivo (live)
 # jogos = wd_Chrome.find_elements(By.CSS_SELECTOR,'div.event__match--live')
@@ -105,7 +106,7 @@ id_jogos = [i[4:] for i in id_jogos]
 jogo = {
     'Date': [], 'Time': [], 'Country': [], 'League': [], 'Home': [], 'Away': [],
     'golsHome': [], 'jogosHome': [], 'golsAway': [], 'jogosAway': [],
-    'avgHome': [], 'sdHome': [], 'avgAway': [], 'sdAway': [], 'avgSum': [],
+    'avgHome': [], 'avgAway': [], 'avgAvg': [],
     '0x0': [], '1x0': [], '2x0': [], '1x1': [], '0x1': [], '0x2': [], 'U25': [], 'O25': []
 }
 
@@ -185,11 +186,11 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         jogosHome = total
         mediaGolsHome = golsHome/jogosHome
         golsArrayHome = np.array(golsArrayHome)
-        sdHome = golsArrayHome.std()  # Calcular o SD de golsArrayHome
+        # sdHome = golsArrayHome.std()  # Calcular o SD de golsArrayHome
         # gols sofridos em casa
         golsSofridosArray = np.array(golsSofridosArray)
         mediaGolsSofridosHome = np.mean(golsSofridosArray)
-        sdGolsSofridosHome = golsSofridosArray.std()
+        # sdGolsSofridosHome = golsSofridosArray.std()
         
 
         ### AWAY ###
@@ -231,17 +232,16 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         jogosAway = total
         mediaGolsAway = golsAway/jogosAway
         golsArrayAway = np.array(golsArrayAway)
-        sdAway = golsArrayAway.std()  # Calcular o SD de golsArrayAway
+        # sdAway = golsArrayAway.std()  # Calcular o SD de golsArrayAway
         # gols sofridos visitante
         golsSofridosArray = np.array(golsSofridosArray) 
         mediaGolsSofridosFora = np.mean(golsSofridosArray)
-        sdGolsSofridosAway = golsSofridosArray.std()
+        # sdGolsSofridosAway = golsSofridosArray.std()
 
 
         # Calcular as probabilidades pelo método de simulações de Monte Carlo
-        # Dúvida cruel? multiplicar ou somar????
-        mean1 = mediaGolsHome + mediaGolsSofridosFora # gols marcados home + gols sofridos do visitante
-        mean2 = mediaGolsAway + mediaGolsSofridosHome # gols marcados fora + gols sofridos do home
+        mean1 = np.mean([mediaGolsHome, mediaGolsSofridosFora]) # média entre gols marcados home e gols sofridos do visitante
+        mean2 = np.mean([mediaGolsAway, mediaGolsSofridosHome]) # média entre gols marcados fora e gols sofridos do home
         ngols = 6
 
         probs = {
@@ -329,11 +329,7 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
     # jogo['sdHome'].append(str(round(sdHome, 4)).replace(".", ","))
     jogo['avgAway'].append(str(round(mean2, 4)).replace(".", ","))
     # jogo['sdAway'].append(str(round(sdAway, 4)).replace(".", ","))
-    jogo['avgSum'].append(
-        str(round(
-            (round(mean1, 4) + round(mean2, 4)), 4)
-            ).replace(".", ",")
-    )
+    jogo['avgAvg'].append(str(round((mean1 + mean2)/2, 4)).replace(".", ","))
 
 
 # Para atualizar o CSV a cada 'n' interações.
