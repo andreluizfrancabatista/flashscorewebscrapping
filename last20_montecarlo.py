@@ -74,10 +74,10 @@ time.sleep(2)
 # wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
 # time.sleep(2)
 
-# next_day = wd_Chrome.find_elements(By.CSS_SELECTOR, 'button.calendar__navigation--tomorrow')
-# for button in next_day:
-#     wd_Chrome.execute_script("arguments[0].click();", button)
-# time.sleep(2)
+next_day = wd_Chrome.find_elements(By.CSS_SELECTOR, 'button.calendar__navigation--tomorrow')
+for button in next_day:
+    wd_Chrome.execute_script("arguments[0].click();", button)
+time.sleep(2)
 
 # Identificar o dia dos jogos
 Date = wd_Chrome.find_element(By.CSS_SELECTOR, 'button#calendarMenu').text
@@ -102,6 +102,17 @@ for i in jogos:
 
 # Exemplo de ID de um jogo: 'g_1_Gb7buXVt'
 id_jogos = [i[4:] for i in id_jogos]
+
+# Adicionar esses dados no dict e no csv
+#
+# GPH - gols marcados pelo home em casa
+# GAH - gols sofridos pelo home em casa
+# GPA - gols marcados pelo away fora
+# GAA - gols sofridos pelo away fora
+#
+# mean1 = np.mean([GPH, GAA])
+# mean2 = np.mean([GPA, GAH])
+#
 
 jogo = {
     'Date': [], 'Time': [], 'Country': [], 'League': [], 'Home': [], 'Away': [],
