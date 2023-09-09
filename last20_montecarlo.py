@@ -104,6 +104,7 @@ for i in jogos:
 id_jogos = [i[4:] for i in id_jogos]
 
 # Adicionar esses dados no dict e no csv
+# id - id da partida para comparar a análise com a realidade, comparar com AvgAvg, U25, O25
 #
 # GPH - gols marcados pelo home em casa
 # GAH - gols sofridos pelo home em casa
@@ -122,7 +123,7 @@ jogo = {
 }
 
 # Lista de países vetados
-Countries = ["RUSSIA", "BELARUS", "UKRAINE"]
+Countries = ["RUSSIA", "BELARUS", "UKRAINE", "DR CONGO", "BURKINA FASO", "ZIMBABWE", "ZAMBIA"]
 
 for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
     # if(x>11):
@@ -132,6 +133,10 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
     # Checar se o país está na lista de vetados
     Country = wd_Chrome.find_element(By.CSS_SELECTOR, 'span.tournamentHeader__country').text.split(':')[0]
     if Country in Countries: # not in ["BRAZIL"]:
+        continue
+    League = wd_Chrome.find_element(By.CSS_SELECTOR, 'span.tournamentHeader__country')
+    League = League.find_element(By.CSS_SELECTOR, 'a').text
+    if "FRIENDLY" in League:
         continue
 
     # Pegando as Informacoes Básicas do Jogo
