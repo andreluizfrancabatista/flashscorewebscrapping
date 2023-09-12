@@ -59,8 +59,11 @@ week = {
 }
 
 # Distribuição Poisson
+
+
 def poisson(x, mean):
-  return ((math.exp(-mean) * (pow(mean, x)))/(math.factorial(x)) *100)
+    return ((math.exp(-mean) * (pow(mean, x)))/(math.factorial(x)) * 100)
+
 
 partidas = 30
 
@@ -74,10 +77,11 @@ time.sleep(2)
 # wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
 # time.sleep(2)
 
-next_day = wd_Chrome.find_elements(By.CSS_SELECTOR, 'button.calendar__navigation--tomorrow')
-for button in next_day:
-    wd_Chrome.execute_script("arguments[0].click();", button)
-time.sleep(2)
+# next_day = wd_Chrome.find_elements(
+#     By.CSS_SELECTOR, 'button.calendar__navigation--tomorrow')
+# for button in next_day:
+#     wd_Chrome.execute_script("arguments[0].click();", button)
+# time.sleep(2)
 
 # Identificar o dia dos jogos
 Date = wd_Chrome.find_element(By.CSS_SELECTOR, 'button#calendarMenu').text
@@ -92,7 +96,8 @@ time.sleep(2)
 # Pegando o ID dos Jogos
 id_jogos = []
 # Para jogos agendados (próximos)
-jogos = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__match--scheduled') #scheduled
+jogos = wd_Chrome.find_elements(
+    By.CSS_SELECTOR, 'div.event__match--scheduled')  # scheduled
 
 # Para jogos ao vivo (live)
 # jogos = wd_Chrome.find_elements(By.CSS_SELECTOR,'div.event__match--live')
@@ -104,7 +109,7 @@ for i in jogos:
 id_jogos = [i[4:] for i in id_jogos]
 
 # Adicionar esses dados no dict e no csv
-# id - id da partida para comparar a análise com a realidade, comparar com AvgAvg, U25, O25
+# id - id da partida para comparar a análise com a realidade, comparar com avgSum, U25, O25
 #
 # GPH - gols marcados pelo home em casa
 # GAH - gols sofridos pelo home em casa
@@ -116,45 +121,60 @@ id_jogos = [i[4:] for i in id_jogos]
 #
 
 jogo = {
-    'Date': [], 'Time': [], 'Country': [], 'League': [], 'Home': [], 'Away': [],
-    'golsHome': [], 'jogosHome': [], 'golsAway': [], 'jogosAway': [],
-    'avgHome': [], 'avgAway': [], 'avgAvg': [],
-    '0x0': [], '1x0': [], '2x0': [], '1x1': [], '0x1': [], '0x2': [], 'U25': [], 'O25': []
+    'ID': [], 'Date': [], 'Time': [], 'Country': [], 'League': [], 'Home': [], 'Away': [],
+    'jogosHome': [], 'jogosAway': [], 'GPH': [], 'GAH': [], 'GPA': [], 'GAA': [], 'avgHome': [], 'avgAway': [], 'avgSum': [],
+    'U25': [], 'O25': []
 }
 
 # Lista de países vetados
-Countries = ["RUSSIA", "BELARUS", "UKRAINE", "DR CONGO", "BURKINA FASO", "ZIMBABWE", "ZAMBIA"]
+Countries = ["RUSSIA", "BELARUS", "UKRAINE",
+             "DR CONGO", "BURKINA FASO", "ZIMBABWE", "ZAMBIA"]
 
 for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
-    # if(x>11):
-    #     break
-    wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary/')  # English
+    if(x>50):
+        break
+    wd_Chrome.get(
+        f'https://www.flashscore.com/match/{link}/#/match-summary/')  # English
 
     # Checar se o país está na lista de vetados
-    Country = wd_Chrome.find_element(By.CSS_SELECTOR, 'span.tournamentHeader__country').text.split(':')[0]
-    if Country in Countries: # not in ["BRAZIL"]:
+    Country = wd_Chrome.find_element(
+        By.CSS_SELECTOR, 'span.tournamentHeader__country').text.split(':')[0]
+    if Country in Countries:  # not in ["BRAZIL"]:
         continue
-    League = wd_Chrome.find_element(By.CSS_SELECTOR, 'span.tournamentHeader__country')
+    League = wd_Chrome.find_element(
+        By.CSS_SELECTOR, 'span.tournamentHeader__country')
     League = League.find_element(By.CSS_SELECTOR, 'a').text
     if "FRIENDLY" in League:
         continue
 
     # Pegando as Informacoes Básicas do Jogo
     try:
-        Date = wd_Chrome.find_element(By.CSS_SELECTOR, 'div.duelParticipant__startTime').text.split(' ')[0]
-        Time = wd_Chrome.find_element(By.CSS_SELECTOR, 'div.duelParticipant__startTime').text.split(' ')[1]
-        Country = wd_Chrome.find_element(By.CSS_SELECTOR, 'span.tournamentHeader__country').text.split(':')[0]
-        League = wd_Chrome.find_element(By.CSS_SELECTOR, 'span.tournamentHeader__country')
+        Date = wd_Chrome.find_element(
+            By.CSS_SELECTOR, 'div.duelParticipant__startTime').text.split(' ')[0]
+        Time = wd_Chrome.find_element(
+            By.CSS_SELECTOR, 'div.duelParticipant__startTime').text.split(' ')[1]
+        Country = wd_Chrome.find_element(
+            By.CSS_SELECTOR, 'span.tournamentHeader__country').text.split(':')[0]
+        League = wd_Chrome.find_element(
+            By.CSS_SELECTOR, 'span.tournamentHeader__country')
         League = League.find_element(By.CSS_SELECTOR, 'a').text
-        Home = wd_Chrome.find_element(By.CSS_SELECTOR, 'div.duelParticipant__home')
-        LinkHome = Home.find_element(By.CSS_SELECTOR, 'div.participant__participantName')
-        LinkHome = LinkHome.find_element(By.TAG_NAME, 'a').get_attribute('href')
-        Home = Home.find_element(By.CSS_SELECTOR, 'div.participant__participantName').text
-        Away = wd_Chrome.find_element(By.CSS_SELECTOR, 'div.duelParticipant__away')
-        LinkAway = Away.find_element(By.CSS_SELECTOR, 'div.participant__participantName')
-        LinkAway = LinkAway.find_element(By.TAG_NAME, 'a').get_attribute('href')
-        Away = Away.find_element(By.CSS_SELECTOR, 'div.participant__participantName').text
-        
+        Home = wd_Chrome.find_element(
+            By.CSS_SELECTOR, 'div.duelParticipant__home')
+        LinkHome = Home.find_element(
+            By.CSS_SELECTOR, 'div.participant__participantName')
+        LinkHome = LinkHome.find_element(
+            By.TAG_NAME, 'a').get_attribute('href')
+        Home = Home.find_element(
+            By.CSS_SELECTOR, 'div.participant__participantName').text
+        Away = wd_Chrome.find_element(
+            By.CSS_SELECTOR, 'div.duelParticipant__away')
+        LinkAway = Away.find_element(
+            By.CSS_SELECTOR, 'div.participant__participantName')
+        LinkAway = LinkAway.find_element(
+            By.TAG_NAME, 'a').get_attribute('href')
+        Away = Away.find_element(
+            By.CSS_SELECTOR, 'div.participant__participantName').text
+
         # Verificar se o nome do time tem (xxx) no final e remover
         if ")" in Home:
             pos = Home.find('(')
@@ -166,27 +186,31 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         # Acessar a página de /results/ de cada time (Home e Away)
         ### HOME ###
         # Inicializando variáveis de contagem
-        gols = 0
+        # gols = 0
         total = 0
         golsArrayHome = []
         golsSofridosArray = []
         wd_Chrome.get(f'{LinkHome}results/')  # English
         # OR 'div.event__match--last'
-        jogos = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__match--static')
+        jogos = wd_Chrome.find_elements(
+            By.CSS_SELECTOR, 'div.event__match--static')
         for i in jogos:
             try:
-                resultHome = i.find_element(By.CSS_SELECTOR, 'div.event__participant--home').text
+                resultHome = i.find_element(
+                    By.CSS_SELECTOR, 'div.event__participant--home').text
                 # Verificar se o nome do time tem (xxx) no final e remover
                 if ")" in resultHome:
                     pos = resultHome.find('(')
                     resultHome = resultHome[:pos-1]
                 if (Home == resultHome):
-                    golsHome = i.find_element(By.CSS_SELECTOR, 'div.event__score--home').text
-                    golsSofridos = i.find_element(By.CSS_SELECTOR, 'div.event__score--away').text
+                    golsHome = i.find_element(
+                        By.CSS_SELECTOR, 'div.event__score--home').text
+                    golsSofridos = i.find_element(
+                        By.CSS_SELECTOR, 'div.event__score--away').text
                     if(golsHome != "-"):
                         # gols marcardos em casa
                         golsHome = int(golsHome)
-                        gols += golsHome
+                        # gols += golsHome
                         total += 1  # total de jogos que o time Home fez em casa dentro da lista de 30 jogos
                         golsArrayHome.append(golsHome)
                         # gols sofridos em casa
@@ -198,20 +222,22 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
                 print(f'\n{Home} x {LinkHome}: {error}')
 
         # Calcular o total de jogos, a média e desvio padrão
-        golsHome = gols
+        # golsHome = gols
         jogosHome = total
-        mediaGolsHome = golsHome/jogosHome
+        # mediaGolsHome = golsHome/jogosHome
         golsArrayHome = np.array(golsArrayHome)
+        mediaGolsHome = np.mean(golsArrayHome)
         # sdHome = golsArrayHome.std()  # Calcular o SD de golsArrayHome
         # gols sofridos em casa
         golsSofridosArray = np.array(golsSofridosArray)
         mediaGolsSofridosHome = np.mean(golsSofridosArray)
         # sdGolsSofridosHome = golsSofridosArray.std()
-        
+        gph = mediaGolsHome
+        gah = mediaGolsSofridosHome
 
         ### AWAY ###
         # Inicializando variáveis de contagem
-        gols = 0
+        # gols = 0
         total = 0
         golsArrayAway = []
         golsSofridosArray = []
@@ -221,18 +247,21 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
             By.CSS_SELECTOR, 'div.event__match--static')
         for i in jogos:
             try:
-                resultAway = i.find_element(By.CSS_SELECTOR, 'div.event__participant--away').text
+                resultAway = i.find_element(
+                    By.CSS_SELECTOR, 'div.event__participant--away').text
                 # Verificar se o nome do time tem (xxx) no final e remover
                 if ")" in resultAway:
                     pos = resultAway.find('(')
                     resultAway = resultAway[:pos-1]
                 if (Away == resultAway):
-                    golsAway = i.find_element(By.CSS_SELECTOR, 'div.event__score--away').text
-                    golsSofridos = i.find_element(By.CSS_SELECTOR, 'div.event__score--home').text
+                    golsAway = i.find_element(
+                        By.CSS_SELECTOR, 'div.event__score--away').text
+                    golsSofridos = i.find_element(
+                        By.CSS_SELECTOR, 'div.event__score--home').text
                     if(golsAway != "-"):
                         # gols marcados visitante
                         golsAway = int(golsAway)
-                        gols += golsAway
+                        # gols += golsAway
                         total += 1  # total de jogos que o time Away fez fora de casa dentro da lista de 30 jogos
                         golsArrayAway.append(golsAway)
                         # gols sofridos visitante
@@ -244,25 +273,29 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
                 print(f'\n{Away} x {LinkAway}: {error}')
 
         # Calcular o total de jogos, a média e desvio padrão
-        golsAway = gols
+        # golsAway = gols
         jogosAway = total
-        mediaGolsAway = golsAway/jogosAway
+        # mediaGolsAway = golsAway/jogosAway
         golsArrayAway = np.array(golsArrayAway)
+        mediaGolsAway = np.mean(golsArrayAway)
         # sdAway = golsArrayAway.std()  # Calcular o SD de golsArrayAway
         # gols sofridos visitante
-        golsSofridosArray = np.array(golsSofridosArray) 
+        golsSofridosArray = np.array(golsSofridosArray)
         mediaGolsSofridosFora = np.mean(golsSofridosArray)
         # sdGolsSofridosAway = golsSofridosArray.std()
-
+        gpa = mediaGolsAway
+        gaa = mediaGolsSofridosFora
 
         # Calcular as probabilidades pelo método de simulações de Monte Carlo
-        mean1 = np.mean([mediaGolsHome, mediaGolsSofridosFora]) # média entre gols marcados home e gols sofridos do visitante
-        mean2 = np.mean([mediaGolsAway, mediaGolsSofridosHome]) # média entre gols marcados fora e gols sofridos do home
+        # média entre gols marcados home e gols sofridos do visitante
+        mean1 = np.mean([mediaGolsHome, mediaGolsSofridosFora])
+        # média entre gols marcados fora e gols sofridos do home
+        mean2 = np.mean([mediaGolsAway, mediaGolsSofridosHome])
         ngols = 6
 
         probs = {
-            "Home":[],
-            "Away":[]
+            "Home": [],
+            "Away": []
         }
 
         probs["Home"] = [poisson(x, mean1) for x in range(ngols+1)]
@@ -283,16 +316,16 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         s1 = pd.Series(df.index.get_level_values(1))
         s2 = pd.Series(df.columns.get_level_values(1))
         df1 = pd.DataFrame(1, index=s1.index, columns=s2.index)
-        new = round((df1.multiply(s1, axis='index') * s2 / 100),2)
+        new = round((df1.multiply(s1, axis='index') * s2 / 100), 2)
         #
         # new[coluna][linha] - new[away][home]
         #
-        r0x0 = new[0][0] # 0x0 
-        r0x1 = new[1][0] # 0x1
-        r0x2 = new[2][0] # 0x2
-        r1x1 = new[1][1] # 1x1
-        r1x0 = new[0][1] # 1x0
-        r2x0 = new[0][2] # 2x0
+        # r0x0 = new[0][0]  # 0x0
+        # r0x1 = new[1][0]  # 0x1
+        # r0x2 = new[2][0]  # 0x2
+        # r1x1 = new[1][1]  # 1x1
+        # r1x0 = new[0][1]  # 1x0
+        # r2x0 = new[0][2]  # 2x0
         # rU25 = r0x0 + r0x1 + r0x2 + r1x1 + r1x0 + r2x0
 
         #
@@ -307,46 +340,49 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
                     rU25 += new[a][h]
                 else:
                     rO25 += new[a][h]
-        
 
     except Exception as error:
         print(f'\n{error}\nExcept: {Home} x {Away} - {link}')
         pass
 
     # jogo = {
-    #     'Date': [], 'Time': [], 'Country': [], 'League': [], 'Home': [], 'Away': [],
-    #     'golsHome': [], 'jogosHome': [], 'golsAway': [], 'jogosAway': [],
-    #     'avgHome': [], 'sdHome': [], 'avgAway': [], 'sdAway': [], 'avgSum': [],
-    #     '0x0': [], '1x0': [], '2x0': [], '1x1': [], '0x1': [], '0x2': [], 'U25': [], 'O25: []
+    #     'ID': [], 'Date': [], 'Time': [], 'Country': [], 'League': [], 'Home': [], 'Away': [],
+    #     'jogosHome': [], 'GPH': [], 'GAH': [], 'jogosAway': [], 'GPA': [], 'GAA': [],
+    #     'avgHome': [], 'avgAway': [], 'avgSum': [],
+    #     'U25': [], 'O25': []
     # }
 
     # Colocar tudo dentro do df pra salvar no csv
+    jogo['ID'].append(link)
     jogo['Date'].append(Date.replace(".", "/"))
     jogo['Time'].append(Time)
     jogo['Country'].append(Country.replace(";", "-"))
     jogo['League'].append(League.replace(";", "-"))
     jogo['Home'].append(Home.replace(";", "-"))
     jogo['Away'].append(Away.replace(";", "-"))
-    jogo['golsHome'].append(golsHome)
+    
     jogo['jogosHome'].append(jogosHome)
-    jogo['golsAway'].append(golsAway)
+    jogo['GPH'].append(str(round(gph, 4)).replace(".", ",")) 
+    jogo['GAH'].append(str(round(gah, 4)).replace(".", ",")) 
     jogo['jogosAway'].append(jogosAway)
-    
-    jogo['0x0'].append(str(round(r0x0, 4)).replace(".", ","))
-    jogo['0x1'].append(str(round(r0x1, 4)).replace(".", ","))
-    jogo['0x2'].append(str(round(r0x2, 4)).replace(".", ","))
-    jogo['1x1'].append(str(round(r1x1, 4)).replace(".", ","))
-    jogo['1x0'].append(str(round(r1x0, 4)).replace(".", ","))
-    jogo['2x0'].append(str(round(r2x0, 4)).replace(".", ","))
-    jogo['U25'].append(str(round(rU25, 4)).replace(".", ","))
-    jogo['O25'].append(str(round(rO25, 4)).replace(".", ","))
-    
+    jogo['GPA'].append(str(round(gpa, 4)).replace(".", ",")) 
+    jogo['GAA'].append(str(round(gaa, 4)).replace(".", ",")) 
+
+    # jogo['0x0'].append(str(round(r0x0, 4)).replace(".", ","))
+    # jogo['0x1'].append(str(round(r0x1, 4)).replace(".", ","))
+    # jogo['0x2'].append(str(round(r0x2, 4)).replace(".", ","))
+    # jogo['1x1'].append(str(round(r1x1, 4)).replace(".", ","))
+    # jogo['1x0'].append(str(round(r1x0, 4)).replace(".", ","))
+    # jogo['2x0'].append(str(round(r2x0, 4)).replace(".", ","))
+
     jogo['avgHome'].append(str(round(mean1, 4)).replace(".", ","))
     # jogo['sdHome'].append(str(round(sdHome, 4)).replace(".", ","))
     jogo['avgAway'].append(str(round(mean2, 4)).replace(".", ","))
     # jogo['sdAway'].append(str(round(sdAway, 4)).replace(".", ","))
-    jogo['avgAvg'].append(str(round((mean1 + mean2)/2, 4)).replace(".", ","))
+    jogo['avgSum'].append(str(round((mean1 + mean2), 4)).replace(".", ","))
 
+    jogo['U25'].append(str(round(rU25, 4)).replace(".", ","))
+    jogo['O25'].append(str(round(rO25, 4)).replace(".", ","))
 
 # Para atualizar o CSV a cada 'n' interações.
 # Colocar esse código abaixo dentro do loop acima (subir uma identação)
@@ -361,7 +397,7 @@ df = df.sort_values(by=['U25'], ascending=False)
 df.reset_index(inplace=True, drop=True)
 df.index = df.index.set_names(['Nº'])
 df = df.rename(index=lambda x: x + 1)
-filename = "lista_de_jogos/jogos_do_dia_" + \
+filename = "lista_de_jogos/j_" + \
     Date.replace(".", "_")+"_last"+str(partidas) + \
-    "_U25FT_com_SD_com_MonteCarlo.csv"
+    "_U25FT_MC.csv"
 df.to_csv(filename, sep=";")
