@@ -44,8 +44,7 @@ options.add_argument('--disable-crash-reporter')
 options.add_argument('--log-level=3')
 
 # Criação do WebDriver do Chrome
-wd_Chrome = webdriver.Chrome(service=Service(
-    ChromeDriverManager().install()), options=options)
+wd_Chrome = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 # Dict com os dias da semana e as siglas
 week = {
@@ -59,8 +58,6 @@ week = {
 }
 
 # Distribuição Poisson
-
-
 def poisson(x, mean):
     return ((math.exp(-mean) * (pow(mean, x)))/(math.factorial(x)) * 100)
 
@@ -77,11 +74,10 @@ time.sleep(2)
 # wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
 # time.sleep(2)
 
-# next_day = wd_Chrome.find_elements(
-#     By.CSS_SELECTOR, 'button.calendar__navigation--tomorrow')
-# for button in next_day:
-#     wd_Chrome.execute_script("arguments[0].click();", button)
-# time.sleep(2)
+next_day = wd_Chrome.find_elements(By.CSS_SELECTOR, 'button.calendar__navigation--tomorrow')
+for button in next_day:
+    wd_Chrome.execute_script("arguments[0].click();", button)
+time.sleep(2)
 
 # Identificar o dia dos jogos
 Date = wd_Chrome.find_element(By.CSS_SELECTOR, 'button#calendarMenu').text
@@ -96,8 +92,7 @@ time.sleep(2)
 # Pegando o ID dos Jogos
 id_jogos = []
 # Para jogos agendados (próximos)
-jogos = wd_Chrome.find_elements(
-    By.CSS_SELECTOR, 'div.event__match--scheduled')  # scheduled
+jogos = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__match--scheduled')  # scheduled
 
 # Para jogos ao vivo (live)
 # jogos = wd_Chrome.find_elements(By.CSS_SELECTOR,'div.event__match--live')
@@ -127,53 +122,37 @@ jogo = {
 }
 
 # Lista de países vetados
-Countries = ["RUSSIA", "BELARUS", "UKRAINE",
-             "DR CONGO", "BURKINA FASO", "ZIMBABWE", "ZAMBIA"]
+Countries = ["RUSSIA", "BELARUS", "UKRAINE", "DR CONGO", "BURKINA FASO", "ZIMBABWE", "ZAMBIA"]
 
 for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
-    if(x>50):
-        break
-    wd_Chrome.get(
-        f'https://www.flashscore.com/match/{link}/#/match-summary/')  # English
+    # if(x>50):
+    #     break
+    wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary/')  # English
 
     # Checar se o país está na lista de vetados
-    Country = wd_Chrome.find_element(
-        By.CSS_SELECTOR, 'span.tournamentHeader__country').text.split(':')[0]
+    Country = wd_Chrome.find_element(By.CSS_SELECTOR, 'span.tournamentHeader__country').text.split(':')[0]
     if Country in Countries:  # not in ["BRAZIL"]:
         continue
-    League = wd_Chrome.find_element(
-        By.CSS_SELECTOR, 'span.tournamentHeader__country')
+    League = wd_Chrome.find_element(By.CSS_SELECTOR, 'span.tournamentHeader__country')
     League = League.find_element(By.CSS_SELECTOR, 'a').text
     if "FRIENDLY" in League:
         continue
 
     # Pegando as Informacoes Básicas do Jogo
     try:
-        Date = wd_Chrome.find_element(
-            By.CSS_SELECTOR, 'div.duelParticipant__startTime').text.split(' ')[0]
-        Time = wd_Chrome.find_element(
-            By.CSS_SELECTOR, 'div.duelParticipant__startTime').text.split(' ')[1]
-        Country = wd_Chrome.find_element(
-            By.CSS_SELECTOR, 'span.tournamentHeader__country').text.split(':')[0]
-        League = wd_Chrome.find_element(
-            By.CSS_SELECTOR, 'span.tournamentHeader__country')
+        Date = wd_Chrome.find_element(By.CSS_SELECTOR, 'div.duelParticipant__startTime').text.split(' ')[0]
+        Time = wd_Chrome.find_element(By.CSS_SELECTOR, 'div.duelParticipant__startTime').text.split(' ')[1]
+        Country = wd_Chrome.find_element(By.CSS_SELECTOR, 'span.tournamentHeader__country').text.split(':')[0]
+        League = wd_Chrome.find_element(By.CSS_SELECTOR, 'span.tournamentHeader__country')
         League = League.find_element(By.CSS_SELECTOR, 'a').text
-        Home = wd_Chrome.find_element(
-            By.CSS_SELECTOR, 'div.duelParticipant__home')
-        LinkHome = Home.find_element(
-            By.CSS_SELECTOR, 'div.participant__participantName')
-        LinkHome = LinkHome.find_element(
-            By.TAG_NAME, 'a').get_attribute('href')
-        Home = Home.find_element(
-            By.CSS_SELECTOR, 'div.participant__participantName').text
-        Away = wd_Chrome.find_element(
-            By.CSS_SELECTOR, 'div.duelParticipant__away')
-        LinkAway = Away.find_element(
-            By.CSS_SELECTOR, 'div.participant__participantName')
-        LinkAway = LinkAway.find_element(
-            By.TAG_NAME, 'a').get_attribute('href')
-        Away = Away.find_element(
-            By.CSS_SELECTOR, 'div.participant__participantName').text
+        Home = wd_Chrome.find_element(By.CSS_SELECTOR, 'div.duelParticipant__home')
+        LinkHome = Home.find_element(By.CSS_SELECTOR, 'div.participant__participantName')
+        LinkHome = LinkHome.find_element(By.TAG_NAME, 'a').get_attribute('href')
+        Home = Home.find_element(By.CSS_SELECTOR, 'div.participant__participantName').text
+        Away = wd_Chrome.find_element(By.CSS_SELECTOR, 'div.duelParticipant__away')
+        LinkAway = Away.find_element(By.CSS_SELECTOR, 'div.participant__participantName')
+        LinkAway = LinkAway.find_element(By.TAG_NAME, 'a').get_attribute('href')
+        Away = Away.find_element(By.CSS_SELECTOR, 'div.participant__participantName').text
 
         # Verificar se o nome do time tem (xxx) no final e remover
         if ")" in Home:
@@ -192,21 +171,17 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         golsSofridosArray = []
         wd_Chrome.get(f'{LinkHome}results/')  # English
         # OR 'div.event__match--last'
-        jogos = wd_Chrome.find_elements(
-            By.CSS_SELECTOR, 'div.event__match--static')
+        jogos = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__match--static')
         for i in jogos:
             try:
-                resultHome = i.find_element(
-                    By.CSS_SELECTOR, 'div.event__participant--home').text
+                resultHome = i.find_element(By.CSS_SELECTOR, 'div.event__participant--home').text
                 # Verificar se o nome do time tem (xxx) no final e remover
                 if ")" in resultHome:
                     pos = resultHome.find('(')
                     resultHome = resultHome[:pos-1]
                 if (Home == resultHome):
-                    golsHome = i.find_element(
-                        By.CSS_SELECTOR, 'div.event__score--home').text
-                    golsSofridos = i.find_element(
-                        By.CSS_SELECTOR, 'div.event__score--away').text
+                    golsHome = i.find_element(By.CSS_SELECTOR, 'div.event__score--home').text
+                    golsSofridos = i.find_element(By.CSS_SELECTOR, 'div.event__score--away').text
                     if(golsHome != "-"):
                         # gols marcardos em casa
                         golsHome = int(golsHome)
@@ -226,11 +201,13 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         jogosHome = total
         # mediaGolsHome = golsHome/jogosHome
         golsArrayHome = np.array(golsArrayHome)
-        mediaGolsHome = np.mean(golsArrayHome)
+        # mediaGolsHome = np.mean(golsArrayHome)
+        mediaGolsHome = np.mean(golsArrayHome) if golsArrayHome.size > 0 else 0
         # sdHome = golsArrayHome.std()  # Calcular o SD de golsArrayHome
         # gols sofridos em casa
         golsSofridosArray = np.array(golsSofridosArray)
-        mediaGolsSofridosHome = np.mean(golsSofridosArray)
+        # mediaGolsSofridosHome = np.mean(golsSofridosArray)
+        mediaGolsSofridosHome = np.mean(golsSofridosArray) if golsSofridosArray.size > 0 else 0
         # sdGolsSofridosHome = golsSofridosArray.std()
         gph = mediaGolsHome
         gah = mediaGolsSofridosHome
@@ -243,21 +220,17 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         golsSofridosArray = []
         wd_Chrome.get(f'{LinkAway}results/')  # English
         # OR 'div.event__match--last'
-        jogos = wd_Chrome.find_elements(
-            By.CSS_SELECTOR, 'div.event__match--static')
+        jogos = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__match--static')
         for i in jogos:
             try:
-                resultAway = i.find_element(
-                    By.CSS_SELECTOR, 'div.event__participant--away').text
+                resultAway = i.find_element(By.CSS_SELECTOR, 'div.event__participant--away').text
                 # Verificar se o nome do time tem (xxx) no final e remover
                 if ")" in resultAway:
                     pos = resultAway.find('(')
                     resultAway = resultAway[:pos-1]
                 if (Away == resultAway):
-                    golsAway = i.find_element(
-                        By.CSS_SELECTOR, 'div.event__score--away').text
-                    golsSofridos = i.find_element(
-                        By.CSS_SELECTOR, 'div.event__score--home').text
+                    golsAway = i.find_element(By.CSS_SELECTOR, 'div.event__score--away').text
+                    golsSofridos = i.find_element(By.CSS_SELECTOR, 'div.event__score--home').text
                     if(golsAway != "-"):
                         # gols marcados visitante
                         golsAway = int(golsAway)
@@ -277,11 +250,13 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         jogosAway = total
         # mediaGolsAway = golsAway/jogosAway
         golsArrayAway = np.array(golsArrayAway)
-        mediaGolsAway = np.mean(golsArrayAway)
+        # mediaGolsAway = np.mean(golsArrayAway)
+        mediaGolsAway = np.mean(golsArrayAway) if golsArrayAway.size > 0 else 0
         # sdAway = golsArrayAway.std()  # Calcular o SD de golsArrayAway
         # gols sofridos visitante
         golsSofridosArray = np.array(golsSofridosArray)
-        mediaGolsSofridosFora = np.mean(golsSofridosArray)
+        # mediaGolsSofridosFora = np.mean(golsSofridosArray)
+        mediaGolsSofridosFora = np.mean(golsSofridosArray) if mediaGolsSofridosFora.size > 0 else 0
         # sdGolsSofridosAway = golsSofridosArray.std()
         gpa = mediaGolsAway
         gaa = mediaGolsSofridosFora
@@ -398,6 +373,6 @@ df.reset_index(inplace=True, drop=True)
 df.index = df.index.set_names(['Nº'])
 df = df.rename(index=lambda x: x + 1)
 filename = "lista_de_jogos/j_" + \
-    Date.replace(".", "_")+"_last"+str(partidas) + \
+    Date.replace(".", "_") + "_last"+str(partidas) + \
     "_U25FT_MC.csv"
 df.to_csv(filename, sep=";")
