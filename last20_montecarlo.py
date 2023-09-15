@@ -97,6 +97,9 @@ jogos = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.event__match--scheduled') 
 # Para jogos ao vivo (live)
 # jogos = wd_Chrome.find_elements(By.CSS_SELECTOR,'div.event__match--live')
 
+# Para jogos passados
+# jogos = wd_Chrome.find_elements(By.CSS_SELECTOR,'div.event__match--twoLine')
+
 for i in jogos:
     id_jogos.append(i.get_attribute("id"))
 
@@ -250,13 +253,13 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         jogosAway = total
         # mediaGolsAway = golsAway/jogosAway
         golsArrayAway = np.array(golsArrayAway)
-        # mediaGolsAway = np.mean(golsArrayAway)
-        mediaGolsAway = np.mean(golsArrayAway) if golsArrayAway.size > 0 else 0
+        mediaGolsAway = np.mean(golsArrayAway)
+        # mediaGolsAway = np.mean(golsArrayAway) if golsArrayAway.size > 0 else 0
         # sdAway = golsArrayAway.std()  # Calcular o SD de golsArrayAway
         # gols sofridos visitante
         golsSofridosArray = np.array(golsSofridosArray)
-        # mediaGolsSofridosFora = np.mean(golsSofridosArray)
-        mediaGolsSofridosFora = np.mean(golsSofridosArray) if mediaGolsSofridosFora.size > 0 else 0
+        mediaGolsSofridosFora = np.mean(golsSofridosArray)
+        # mediaGolsSofridosFora = np.mean(golsSofridosArray) if mediaGolsSofridosFora.size > 0 else 0
         # sdGolsSofridosAway = golsSofridosArray.std()
         gpa = mediaGolsAway
         gaa = mediaGolsSofridosFora

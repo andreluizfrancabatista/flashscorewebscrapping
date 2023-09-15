@@ -79,11 +79,7 @@ info = {
 # Pegar todas as divs dos times participantes
 teams = wd_Chrome.find_elements(By.CSS_SELECTOR, 'div.ui-table__row')
 
-# Pega o nome do país e da Liga
-league = wd_Chrome.find_element(By.CSS_SELECTOR, 'div.heading__name').text
-print(f'Liga: {league}')
-country = wd_Chrome.find_elements(By.CSS_SELECTOR, 'a.breadcrumb__link')[1].text
-print(f'País: {country}')
+
 
 # Percorre as divs procurando pelos gols
 golsTotal = 0
@@ -96,7 +92,13 @@ for team in teams:
     partidas = team.find_element(By.CSS_SELECTOR, 'span.table__cell--value').text
     partidas = int(partidas)
     partidasTotal += partidas
-    print(f'J: {partidas}. G: {golsp+golsa}')
+    # print(f'J: {partidas}. G: {golsp+golsa}')
 
+# Pega o nome do país e da Liga
+league = wd_Chrome.find_element(By.CSS_SELECTOR, 'div.heading__name').text
+print(f'Liga: {league}')
+country = wd_Chrome.find_elements(By.CSS_SELECTOR, 'a.breadcrumb__link')[1].text
+print(f'País: {country}')
+# Cálculo da média
 mediaGols = golsTotal/partidasTotal
 print(f'Média de gols: {mediaGols}')

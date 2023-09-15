@@ -84,10 +84,10 @@ time.sleep(2)
 # wd_Chrome.find_element(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow').click()
 # time.sleep(2)
 
-next_day = wd_Chrome.find_elements(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow')
-for button in next_day:
-    wd_Chrome.execute_script("arguments[0].click();", button)
-time.sleep(2)
+# next_day = wd_Chrome.find_elements(By.CSS_SELECTOR,'button.calendar__navigation--tomorrow')
+# for button in next_day:
+#     wd_Chrome.execute_script("arguments[0].click();", button)
+# time.sleep(2)
 
 # Identificar o dia dos jogos
 Date = wd_Chrome.find_element(By.CSS_SELECTOR, 'button#calendarMenu').text
@@ -101,7 +101,7 @@ for button in display_matches:
 # Pegando o ID dos Jogos
 id_jogos = []
 ## Para jogos agendados (próximos)
-jogos = wd_Chrome.find_elements(By.CSS_SELECTOR,'div.event__match--scheduled')
+jogos = wd_Chrome.find_elements(By.CSS_SELECTOR,'div.event__match--twoLine') # scheduled
 
 ## Para jogos ao vivo (live)
 # jogos = wd_Chrome.find_elements(By.CSS_SELECTOR,'div.event__match--live')
@@ -113,7 +113,7 @@ for i in jogos:
 id_jogos = [i[4:] for i in id_jogos]
 
 jogo = {
-    'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],
+    'ID':[], 'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],
     'jogosHome':[], 'totalHome':[], 
     'jogosAway':[], 'totalAway':[], 
     'pHome':[], 'pAway':[], 'pSum':[],
@@ -158,14 +158,12 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         Away = Away.find_element(By.CSS_SELECTOR,'div.participant__participantName').text
         
         # Verificar se o nome do time tem (xxx) no final e remover
-        # if "(Am)" not in Home:
-        #     if ")" in Home[-1:]:
-        #         pos = Home.find('(')
-        #         Home = Home[:pos]
-        # if "(Am)" not in Away:
-        #     if ")" in Away[-1:]:
-        #         pos = Away.find('(')
-        #         Away = Away[:pos]
+        if ")" in Home:
+            pos = Home.find('(')
+            Home = Home[:pos-1]
+        if ")" in Away:
+            pos = Away.find('(')
+            Away = Away[:pos-1]
         
         total, golsht = 0, 0
         golsHome, golsAway = 0, 0
@@ -175,7 +173,7 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
         sdHome, sdAway = 0, 0
         totalHome, totalAway = 0, 0
         pHome, pAway = 0, 0
-        # Calcular a porcentagem de over 0,5 no HT de cada time
+        # Calcular a porcentagem de under 2,5 no FT de cada time
         links = [LinkHome, LinkAway]
         for index, sublink in enumerate(links):
             wd_Chrome.get(f'{sublink}results/') # English
@@ -229,6 +227,7 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
     # print(f'{Date}, {Time}, {Country}, {League}\n{Home} {pHome*100:.2f} x {pAway*100:.2f} {Away}\n') 
 
     # Colocar tudo dentro do df pra salvar no csv
+    jogo['ID'].append(link)
     jogo['Date'].append(Date.replace(".", "/"))
     jogo['Time'].append(Time)
     jogo['Country'].append(Country.replace(";", "-"))
