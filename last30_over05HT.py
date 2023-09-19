@@ -116,7 +116,7 @@ for i in jogos:
 id_jogos = [i[4:] for i in id_jogos]
 
 jogo = {
-    'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],
+    'ID': [], 'Date':[],'Time':[],'Country':[],'League':[],'Home':[],'Away':[],
     'golshtHome':[], 'totalHome':[], 
     'golshtAway':[], 'totalAway':[], 
     'pHome':[], 'pAway':[], 'pSum':[],
@@ -229,6 +229,7 @@ for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
     # print(f'{Date}, {Time}, {Country}, {League}\n{Home} {pHome*100:.2f} x {pAway*100:.2f} {Away}\n') 
 
     # Colocar tudo dentro do df pra salvar no csv
+    jogo['ID'].append(link)
     jogo['Date'].append(Date.replace(".", "/"))
     jogo['Time'].append(Time)
     jogo['Country'].append(Country.replace(";", "-"))
