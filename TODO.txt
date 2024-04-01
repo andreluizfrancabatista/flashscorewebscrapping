@@ -19,3 +19,7 @@ O código last20_montecarlo.py já está arrumado
 --- Exception, invalid literal for int() with base 10: '-'
 Motivo: um jogo sem placar, - x -
 Conferir se a informação extraída é int ou um hífen.
+
+--- Pegar as odds de over 2,5
+- Tem jogo que tem odd, e tem jogo que não tem.
+- Talvez os jogos que tenham as odds se comportem com um padrão melhor.

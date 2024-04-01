@@ -124,6 +124,9 @@ jogo = {
 # Lista de países coletados
 # Countries = ["BRAZIL", "GERMANY", "AUSTRIA", "CHINA"]
 
+# Jogos especificos
+# id_jogos = ["lASaCUR2", "z3GZXXJl", "IR5vXiZf"]
+
 for x, link in enumerate(tqdm(id_jogos, total=len(id_jogos))):
     wd_Chrome.get(f'https://www.flashscore.com/match/{link}/#/match-summary/') # English
 
